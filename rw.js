@@ -45,7 +45,7 @@ RW.deco=deco;const _r=window.render;window.render=function(){_r.apply(this,argum
 const _q2=window.quiz;window.quiz=function(){_q2.apply(this,arguments);deco()};
 if(cfg.hang){const _h2=window.hang;window.hang=function(){_h2.apply(this,arguments);deco()}}
 if(cfg.drillFn){const n=cfg.drillFn;const o=window[n];window[n]=function(){o.apply(this,arguments);deco()}}
-cfg.onPlay=k=>{let r;if(cfg.allCards.includes(k)&&(r=pinc(P("cards")+k)))emit({uid,t:"cards",isNew:r===1});if(cfg.story&&cfg.story.includes(k)&&(r=pinc(P("story")+k)))emit({uid,t:"story",isNew:r===1});deco()};
+cfg.onPlay=k=>{let r;const ck=cfg.allCards.includes(k)?k:(cfg.exCard&&cfg.exCard[k]);if(ck&&(r=pinc(P("cards")+ck)))emit({uid,t:"cards",isNew:r===1});if(cfg.story&&cfg.story.includes(k)&&(r=pinc(P("story")+k)))emit({uid,t:"story",isNew:r===1});deco()};
 cfg.onQuiz=ok=>{const r=pinc(P("quiz")+cfg.qkey(),1);emit({uid,t:"quiz",isNew:r===1,ok});deco()};cfg.onSpeak=k=>{const r=pinc(P("speak")+k);if(r)emit({uid,t:"speak",isNew:r===1});deco()};cfg.onHang=w=>{const r=pinc(P("hang")+w,1);emit({uid,t:"hang",isNew:r===1,ok:true});deco()};
 draw();deco();verCheck()},
 home(el,sum){verCheck();if(sum)sum.remove();

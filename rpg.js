@@ -250,7 +250,7 @@ function home(el){migrate();homeEl=el;const draw=()=>{const s=st(),v=lvOf(s.xp),
  <div style="font-size:13px;margin-top:10px">今日：練習 ${s.day.n} 次${has(v.L,"daily")?"（早午餐加倍剩 "+Math.max(0,10-s.day.n)+" 次）":""}・提示 ${left}/${mx}・目前連續答對 ${s.combo}（最佳 ${s.best}）</div>
  <details class="rwr" style="margin-top:8px"><summary>升級規則</summary>
  XP：聽新卡 10（重聽 3）・答對 15（同題再答 8）・答錯 3・口說 12（重複 5）・課文新句 8（重聽 3）・題型全部完成 +50・單元全部完成 +150。<br>
- 屬性：課文跟讀→聽力、口說→口說、單字卡和測驗→詞彙。屬性每升 1 級，該類 XP +2%（上限 30%）。<br>
+ 屬性：課文跟讀→聽力、口說→口說、單字卡和測驗→詞彙（念例句也算單字練習 XP）。屬性每升 1 級，該類 XP +2%（上限 30%）。<br>
  能力：${ABIL.map(a=>"Lv"+a.lv+" "+a.name+"："+a.desc).join("；")}。<br>${s.migXP?"已把之前的💵和練習紀錄換算成 "+s.migXP+" XP。":""}<br>寶藏會依累計 XP 自動開箱，經驗值不會被花掉。</details></div>`;drawAssets()};draw();RPG.onChange=draw;trCheck()}
 window.RPG={page,home,st,lvOf,need,gain,hints,TITLES,ABIL,TREASURES,CATS,trValue,money,worth};
 })();

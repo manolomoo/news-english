@@ -32,5 +32,5 @@ a.nav{color:var(--ac)}
 .zhs{display:none;font-size:15px;line-height:1.5;color:var(--mu);font-weight:400;margin-top:2px}.showzh .zhs{display:block}
 .vl{border-top:1px solid var(--ln);padding-top:10px;display:flex;flex-direction:column;gap:4px}.vw{font-size:15px;line-height:1.45}.vw.pl{cursor:pointer}.vw .vn{color:#c0392b;margin-right:3px}
 
-.bc{padding:12px 14px;gap:4px}.bc .big{font-size:34px;line-height:1.15}.bc .pm{line-height:1.1}.bc .pm:empty,.bc #ipa:empty,.bc #def,.bc #ex:empty{display:none}.bc #tag{font-size:15px;line-height:1.3}.bc #tag .nt{font-size:12px;display:block}.bc #ex{margin-top:4px;line-height:1.4}.bc .cue{padding:6px 10px;font-size:16px;margin-top:2px}
+.bc{padding:12px 14px;gap:4px}.bc .big{font-size:34px;line-height:1.15}.bc .pm{line-height:1.1}.bc .pm:empty,.bc #ipa,.bc #def,.bc #ex:empty{display:none}.bc #tag{font-size:15px;line-height:1.3}.bc #tag .nt{font-size:12px;display:block}.bc #ex{text-align:center;margin-top:4px;line-height:1.4}.bc .cue{padding:6px 10px;font-size:16px;margin-top:2px}
 .bc .cue:empty{display:none}

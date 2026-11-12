@@ -22,11 +22,11 @@ const echoGap=d=>Math.max(1,d+.3),shadowGap=d=>Math.max(1.5,d*1.25+.6);
 function stop(){TTS.cancel();run++;playing=false;setCue("");clearHl();render()}
 async function once(keys){stop();await seq(keys)}
 /* ===== 單字圖卡 ===== */
-function grid(){$("ga").innerHTML=list().map((c,k)=>`<div class="ca${k===i?" cur":""}" data-k="${k}"><span class="sp">🔊</span><div class="en">${esc(c.w)}</div><div class="zh">${esc(c.zq||c.zh||"")}</div><div class="tg">${esc(c.tag||c.pos.split(/[,（(\[]/)[0])}</div></div>`).join("");
+function grid(){$("ga").innerHTML=list().map((c,k)=>`<div class="ca${k===i?" cur":""}" data-k="${k}"><span class="sp">🔊</span><div class="en">${esc(c.w)}</div><div class="zh">${esc(c.zq||c.zh||"")}</div><div class="tg">${esc(c.pos.split(/[,，（(\[]/)[0].trim())}</div></div>`).join("");
  $("ga").querySelectorAll(".ca").forEach(el=>el.onclick=()=>{stop();i=+el.dataset.k;render();once(cardKeys(list()[i]))})}
 function cardKeys(c){return c.ex?[key(c),c.ex]:[key(c)]}
 function render(){const L=list();if(i>=L.length)i=0;const c=L[i];$("pos").textContent=G[g].name+"　"+(i+1)+" / "+L.length;
- $("w").textContent=c.w;$("tag").innerHTML=esc(c.pos.split(/[,，（(\[]/)[0].trim())+(c.note?` <span class="nt">${esc(c.note)}</span>`:"");$("ipa").textContent=c.ipa||"";
+ $("w").textContent=c.w;$("tag").innerHTML=esc(c.pos.split(/[,，（(\[]/)[0].trim());$("ipa").textContent="";
  $("def").textContent="";$("zh").textContent=c.zh||"";
  $("ex").innerHTML=c.ex?`<div>${esc(c.ex)}</div><div class="mu">${esc(c.exzh||"")}</div>`+(c.ex2?`<div style="margin-top:6px">${esc(c.ex2)}</div><div class="mu">${esc(c.ex2zh||"")}</div>`:""):"";
  grid()}
@@ -90,4 +90,4 @@ seg($("rate"),R.map(r=>r+"x"),R.indexOf(rate),k=>{rate=R[k]});
 seg($("dkseg"),DK.map(x=>x.name),dk,k=>{stop();dk=k;di=0;drill()});
 if(!TTS.supported())$("nov").style.display="";
 try{qi=Math.floor(Math.random()*Q.length);setCue("");render();quiz();drill();window.__unitReady=1}catch(e){console.error(e);document.body.insertAdjacentHTML("afterbegin","<div style='padding:12px;color:#d64545'>載入失敗："+e+"</div>")}
-RW.page(W.uid,{qans:()=>Q[qi].a,list:()=>list(),idx:()=>i,cardKey:c=>key(c),qkey:()=>Q[qi].k,drillFn:"drill",cards:ALL.map(key),story:SENT,score:()=>score,done:()=>done,speakBtn:$("dr"),speakText:()=>$("da").textContent});RPG.page();
+RW.page(W.uid,{qans:()=>Q[qi].a,list:()=>list(),idx:()=>i,cardKey:c=>key(c),qkey:()=>Q[qi].k,drillFn:"drill",cards:ALL.map(key),exCard:Object.fromEntries(ALL.flatMap(c=>[c.ex,c.ex2].filter(Boolean).map(e=>[e,key(c)]))),story:SENT,score:()=>score,done:()=>done,speakBtn:$("dr"),speakText:()=>$("da").textContent});RPG.page();
