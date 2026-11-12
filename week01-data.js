@@ -1,8 +1,8 @@
-/* 第 1 週｜2026/11/11–12 講義資料（依講義第 5–26 頁）
+/* 第 1 週｜2026/11/11 講義資料（依講義第 5–26 頁）
    卡片欄位：w 單字、say 念出來的字（預設同 w）、pos 詞性、ipa 音標（講義有才放）、def 英文定義、zh 中文、zq 測驗用短中文（可省略）、ex/exzh 例句與中譯、note 備註
    中譯 zh 與課文 paras 一一對應（只顯示、不念）；vocab = 本篇較難單字 [詞, 中文(省略則取單字卡), 講義編號]
    課文標記：{1|difference} = 講義編號重點詞；[[…]] = 只顯示、不念的講義註解 */
-window.WEEK={uid:"w1",n:1,dates:"2026/11/11–12",
+window.WEEK={uid:"w1",n:1,dates:"2026/11/11",
 groups:[
 {name:"咖啡篇單字",cards:[
  {w:"triple-digit",pos:"adjective [before noun]",def:"relating to a number or series of numbers between 100 and 999.",zh:"三位數的",zq:"三位數的",ex:"The coffee has a triple-digit price tag.",exzh:"這杯咖啡的標價是三位數。"},

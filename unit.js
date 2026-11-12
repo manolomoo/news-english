@@ -23,7 +23,7 @@ function stop(){TTS.cancel();run++;playing=false;setCue("");clearHl();render()}
 async function once(keys){stop();await seq(keys)}
 /* ===== 單字圖卡 ===== */
 function grid(){$("ga").innerHTML=list().map((c,k)=>`<div class="ca${k===i?" cur":""}" data-k="${k}"><span class="sp">🔊</span><div class="en">${esc(c.w)}</div><div class="zh">${esc(c.zq||c.zh||"")}</div><div class="tg">${esc(c.pos.split(/[,，（(\[]/)[0].trim())}</div></div>`).join("");
- $("ga").querySelectorAll(".ca").forEach(el=>el.onclick=()=>{stop();i=+el.dataset.k;render();once(cardKeys(list()[i]))})}
+ $("ga").querySelectorAll(".ca").forEach(el=>el.onclick=()=>{stop();i=+el.dataset.k;render();once([key(list()[i])])})}
 function cardKeys(c){return c.ex?[key(c),c.ex]:[key(c)]}
 function render(){const L=list();if(i>=L.length)i=0;const c=L[i];$("pos").textContent=G[g].name+"　"+(i+1)+" / "+L.length;
  $("w").textContent=c.w;$("tag").innerHTML=esc(c.pos.split(/[,，（(\[]/)[0].trim());$("ipa").textContent="";
@@ -81,7 +81,7 @@ function drill(){const d=DK[dk],it=d.items[di];$("dlab").textContent=d.kind==="s
 $("dr").onclick=()=>{$("da").style.visibility="visible";$("dnote").style.display="";const d=DK[dk],it=d.items[di];once(d.kind==="say"?it.a:[it.a[0]])};
 $("dn").onclick=()=>{stop();const n=DK[dk].items.length;di=n>1?(di+1+Math.floor(Math.random()*(n-1)))%n:0;drill()};
 $("dq").onclick=()=>{if(DK[dk].kind==="qa")once([DK[dk].items[di].q.replace(/^(Q\d|Question):\s*/,"")])};
-$("o1").onclick=()=>once(cardKeys(list()[i]));$("o2").onclick=()=>{const e=list()[i].ex;if(e)once([e])};
+$("o1").onclick=()=>once([key(list()[i])]);$("o2").onclick=()=>{const e=list()[i].ex;if(e)once([e])};
 $("pv").onclick=()=>{stop();i=(i-1+list().length)%list().length;render()};$("nx").onclick=()=>{stop();i=(i+1)%list().length;render()};$("pl").onclick=()=>playing?stop():play();
 $("texts").innerHTML=textsHTML();bindTexts();
 $("syn").innerHTML=synHTML();$("syn").querySelectorAll("tr").forEach(tr=>tr.onclick=()=>once([W.syn[+tr.dataset.k][0]]));
