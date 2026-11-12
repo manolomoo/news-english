@@ -3,9 +3,10 @@
 const K="enLadyRPG1";let MEM=null;
 const ld=()=>{try{const v=localStorage.getItem(K);if(v)return JSON.parse(v)}catch(e){}return MEM||{}};
 const sv=d=>{MEM=d;try{localStorage.setItem(K,JSON.stringify(d))}catch(e){}};
-const TITLES=[["Newcomer","小資女"],["Lady Reader","氣質小姐"],["Elegant Dame","優雅淑女"],["Fashionista","時尚達人"],["Socialite","社交名媛"],["Madam","豪門太太"],["Grande Dame","上流貴婦"],["Collector","精品收藏家"],["Philanthropist","慈善名流"],["Duchess","公爵夫人"],["Social Queen","社交女王"],["Grand Lady","頂級貴婦"]];
-const need=L=>Math.round(60*Math.pow(L,1.45));            // Lv L → L+1 所需 XP
-function lvOf(xp){let L=1,r=xp;while(r>=need(L)){r-=need(L);L++}return{L,cur:r,nx:need(L)}}
+const TITLES=[["Newcomer","小資女"],["Lady Reader","氣質小姐"],["Elegant Dame","優雅淑女"],["Fashionista","時尚達人"],["Socialite","社交名媛"],["Madam","豪門太太"],["Grande Dame","上流貴婦"],["Collector","精品收藏家"],["Philanthropist","慈善名流"],["Duchess","公爵夫人"],["Social Queen","社交女王"],["Grand Lady","頂級貴婦"],["Dynasty Lady","世家貴婦"],["Global Icon","國際名媛"],["Countess","伯爵夫人"],["Marchioness","侯爵夫人"],["Royal Consort","皇室貴妃"],["Princess","公主殿下"],["Crown Princess","王儲妃"],["Queen","王后"],["Empress","女皇"],["Legendary Empress","傳奇女皇"],["Immortal Empress","不朽女皇"],["Eternal Empress","永恆女皇"]];
+const MAXLV=24;
+const need=L=>Math.round(190*Math.pow(L,0.60));            // Lv L → L+1 所需 XP
+function lvOf(xp){let L=1,r=xp;while(L<MAXLV&&r>=need(L)){r-=need(L);L++}return L>=MAXLV?{L,cur:1,nx:1,max:true}:{L,cur:r,nx:need(L)}}   // 24 級滿級：經驗條 100%
 const title=L=>TITLES[Math.min(L,TITLES.length)-1];
 const ABIL=[
  {lv:2,id:"daily",name:"早午餐加倍",desc:"每天前 10 次練習 XP ×2"},
@@ -21,7 +22,19 @@ const ABIL=[
  {lv:10,id:"cool",name:"墨鏡登場",desc:"頭像造型解鎖：墨鏡"},
  {lv:10,id:"gold",name:"鑽石項鍊",desc:"項鍊與頭像框解鎖：金鑽"},
  {lv:12,id:"combo3",name:"名媛社交 III",desc:"連續答對 10 題起，答題 XP ×2"},
- {lv:12,id:"crown",name:"貴婦后冠",desc:"頭像造型解鎖：后冠"}];
+ {lv:12,id:"crown",name:"貴婦后冠",desc:"頭像造型解鎖：后冠"},
+ {lv:13,id:"pearl",name:"珍珠耳環",desc:"頭像造型解鎖：珍珠耳環"},
+ {lv:14,id:"bow",name:"粉紅蝴蝶結髮飾",desc:"頭像造型解鎖：髮飾"},
+ {lv:15,id:"ruby",name:"酒紅禮服與紅寶耳環",desc:"頭像造型解鎖：酒紅禮服、紅寶耳環"},
+ {lv:16,id:"glove",name:"白色長手套",desc:"頭像造型解鎖：長手套"},
+ {lv:17,id:"stole",name:"皮草披肩",desc:"頭像造型解鎖：肩上皮草"},
+ {lv:18,id:"tiara",name:"公主冠",desc:"頭像造型解鎖：更高更細、寶石更多的公主冠"},
+ {lv:19,id:"sash",name:"皇家綬帶",desc:"頭像造型解鎖：斜肩綬帶與勳章"},
+ {lv:20,id:"queen",name:"王后冠與皇家紫",desc:"頭像造型解鎖：王后冠、皇家紫禮服、紫金頭像框"},
+ {lv:21,id:"empress",name:"女皇華服",desc:"頭像造型解鎖：最大女皇冠、金紫禮服、權杖、白鼬披風、華麗頭像框"},
+ {lv:22,id:"halo",name:"傳奇光環",desc:"頭像造型解鎖：金色光環與光芒"},
+ {lv:23,id:"starry",name:"銀白星光禮服",desc:"頭像造型解鎖：銀白禮服、星光點綴、銀白頭像框"},
+ {lv:24,id:"eternal",name:"永恆鑽石冠與極光框",desc:"頭像造型解鎖：鑽石后冠、虹彩禮服、極光頭像框、最強光環（滿級）"}];
 const has=(L,id)=>ABIL.some(a=>a.id===id&&L>=a.lv);
 const ATTR={lis:"聽力",spk:"口說",voc:"詞彙"};
 const attrOf=(t,uid)=>t==="story"?"lis":t==="speak"?"spk":t==="cards"||t==="quiz"||t==="hang"?"voc":null;
@@ -40,58 +53,68 @@ const W=1e4,Y=1e8;                                         // 萬、億（新台
 // 依 xp 由小到大排列；id 一旦上線就不要改。grow:1 = 股票，身價會隨累計 XP 增值（value 為基準價）
 const TREASURES=[
  {id:"shoe-chanel-flat",xp:60,cat:"shoe",name:"香奈兒 雙色芭蕾平底鞋",value:3*W,ico:"🥿"},
- {id:"dog-maltese",xp:120,cat:"dog",name:"馬爾濟斯「棉花糖」",value:5*W,ico:"🐶"},
- {id:"jewel-tiffany-heart",xp:190,cat:"jewel",name:"Tiffany 愛心純銀手鍊",value:2*W,ico:"💝"},
- {id:"bag-gucci-marmont",xp:270,cat:"bag",name:"Gucci Marmont 鏈帶包",value:8*W,ico:"👛"},
- {id:"cloth-burberry-trench",xp:360,cat:"cloth",name:"Burberry 經典風衣",value:9*W,ico:"🧥"},
- {id:"shoe-jimmychoo",xp:460,cat:"shoe",name:"Jimmy Choo 水鑽高跟鞋",value:4*W,ico:"👠"},
- {id:"dog-poodle",xp:570,cat:"dog",name:"紅貴賓犬「可可」",value:6*W,ico:"🐩"},
- {id:"bag-lv-speedy",xp:690,cat:"bag",name:"LV Speedy 25 老花包",value:7*W,ico:"👜"},
- {id:"jewel-akoya-pearl",xp:820,cat:"jewel",name:"Akoya 珍珠項鍊",value:12*W,ico:"📿"},
- {id:"shoe-louboutin",xp:960,cat:"shoe",name:"Louboutin 紅底高跟鞋",value:5*W,ico:"👠"},
- {id:"cloth-chanel-tweed",xp:1100,cat:"cloth",name:"香奈兒 斜紋軟呢外套",value:28*W,ico:"🧥"},
- {id:"art-monet-print",xp:1250,cat:"art",name:"莫內《睡蓮》限量版畫",value:30*W,ico:"🖼️"},
- {id:"dog-shiba",xp:1400,cat:"dog",name:"柴犬「麻糬」",value:8*W,ico:"🐕"},
- {id:"stock-tsmc",xp:1560,cat:"stock",name:"台積電股票 1 張",value:110*W,ico:"📈",grow:1},
- {id:"bag-lady-dior",xp:1730,cat:"bag",name:"Dior Lady Dior 黛妃包",value:22*W,ico:"👜"},
- {id:"jewel-cartier-love",xp:1900,cat:"jewel",name:"Cartier Love 手環",value:25*W,ico:"💍"},
- {id:"shoe-manolo",xp:2080,cat:"shoe",name:"Manolo Blahnik 鑽扣緞面鞋",value:5*W,ico:"👡"},
- {id:"stock-nvidia",xp:2270,cat:"stock",name:"輝達 NVIDIA 股票 100 股",value:60*W,ico:"💹",grow:1},
- {id:"bag-chanel-cf",xp:2470,cat:"bag",name:"香奈兒 經典口蓋包",value:35*W,ico:"👜"},
- {id:"dog-frenchie",xp:2700,cat:"dog",name:"法國鬥牛犬「布丁」",value:10*W,ico:"🐶"},
- {id:"jewel-vca-alhambra",xp:2950,cat:"jewel",name:"梵克雅寶 四葉草項鍊",value:30*W,ico:"🍀"},
- {id:"cloth-dior-bar",xp:3200,cat:"cloth",name:"Dior Bar Jacket 套裝",value:45*W,ico:"👚"},
- {id:"shoe-roger-vivier",xp:3500,cat:"shoe",name:"Roger Vivier 水鑽方扣鞋",value:6*W,ico:"🥿"},
- {id:"bag-hermes-kelly",xp:3800,cat:"bag",name:"愛馬仕 Kelly 28 黑金",value:60*W,ico:"👜"},
- {id:"dog-corgi",xp:4100,cat:"dog",name:"柯基「吐司」",value:9*W,ico:"🐕"},
- {id:"art-kusama-pumpkin",xp:4450,cat:"art",name:"草間彌生《南瓜》版畫",value:150*W,ico:"🎃"},
- {id:"jewel-tiffany-diamond",xp:4800,cat:"jewel",name:"Tiffany 六爪鑽戒 2 克拉",value:180*W,ico:"💍"},
- {id:"stock-apple",xp:5200,cat:"stock",name:"蘋果 Apple 股票 100 股",value:80*W,ico:"🍎",grow:1},
- {id:"bag-hermes-birkin",xp:5600,cat:"bag",name:"愛馬仕 Birkin 30 金棕",value:90*W,ico:"👜"},
- {id:"car-porsche-911",xp:6000,cat:"car",name:"Porsche 911 Carrera",value:700*W,ico:"🚗"},
- {id:"cloth-valentino-gown",xp:6500,cat:"cloth",name:"Valentino 紅色晚禮服",value:60*W,ico:"👗"},
- {id:"art-vangogh-sketch",xp:7000,cat:"art",name:"梵谷 鳶尾花素描",value:800*W,ico:"🌻"},
- {id:"house-tokyo",xp:7500,cat:"house",name:"東京港區公寓",value:4500*W,ico:"🏙️"},
- {id:"dog-afghan",xp:8000,cat:"dog",name:"阿富汗獵犬「香檳」",value:20*W,ico:"🦮"},
- {id:"jewel-cartier-panthere",xp:8600,cat:"jewel",name:"Cartier 美洲豹鑽石胸針",value:600*W,ico:"🐆"},
- {id:"car-bentley",xp:9200,cat:"car",name:"Bentley Continental GT",value:1500*W,ico:"🚙"},
- {id:"cloth-haute-couture",xp:10000,cat:"cloth",name:"巴黎高訂晚禮服",value:300*W,ico:"👗"},
- {id:"car-ferrari",xp:11000,cat:"car",name:"Ferrari Roma",value:1800*W,ico:"🏎️"},
- {id:"house-xinyi",xp:12000,cat:"house",name:"信義區豪宅",value:2.8*Y,ico:"🏢"},
- {id:"bag-hermes-himalaya",xp:13200,cat:"bag",name:"愛馬仕 喜馬拉雅鱷魚皮 Birkin",value:1200*W,ico:"👜"},
- {id:"art-picasso",xp:14500,cat:"art",name:"畢卡索 肖像畫",value:3000*W,ico:"🎨"},
- {id:"car-lamborghini",xp:16000,cat:"car",name:"Lamborghini Revuelto",value:3000*W,ico:"🏎️"},
- {id:"stock-berkshire",xp:17500,cat:"stock",name:"波克夏 A 股 1 股",value:2000*W,ico:"💹",grow:1},
- {id:"house-london",xp:19000,cat:"house",name:"倫敦梅費爾聯排別墅",value:6*Y,ico:"🏛️"},
- {id:"car-rolls-royce",xp:20500,cat:"car",name:"Rolls-Royce Phantom",value:4500*W,ico:"🚘"},
- {id:"art-klimt",xp:22000,cat:"art",name:"克林姆 金箔仕女畫",value:2*Y,ico:"🖼️"},
- {id:"jewel-pink-diamond",xp:23500,cat:"jewel",name:"10 克拉粉紅鑽",value:3*Y,ico:"💎"},
- {id:"house-provence",xp:25000,cat:"house",name:"南法蔚藍海岸別墅",value:8*Y,ico:"🏡"},
- {id:"jet-riva",xp:27000,cat:"jet",name:"Riva 經典木質遊艇",value:1.2*Y,ico:"🚤"},
- {id:"art-monet-original",xp:29000,cat:"art",name:"莫內《睡蓮》真跡",value:25*Y,ico:"🖼️"},
- {id:"house-monaco",xp:31000,cat:"house",name:"摩納哥海景頂層公寓",value:12*Y,ico:"🏰"},
- {id:"jet-superyacht",xp:34000,cat:"jet",name:"60 米超級遊艇",value:15*Y,ico:"🛥️"},
- {id:"jet-g700",xp:38000,cat:"jet",name:"灣流 G700 私人飛機",value:25*Y,ico:"🛩️"}];
+ {id:"dog-maltese",xp:70,cat:"dog",name:"馬爾濟斯「棉花糖」",value:5*W,ico:"🐶"},
+ {id:"jewel-tiffany-heart",xp:80,cat:"jewel",name:"Tiffany 愛心純銀手鍊",value:2*W,ico:"💝"},
+ {id:"bag-gucci-marmont",xp:90,cat:"bag",name:"Gucci Marmont 鏈帶包",value:8*W,ico:"👛"},
+ {id:"cloth-burberry-trench",xp:100,cat:"cloth",name:"Burberry 經典風衣",value:9*W,ico:"🧥"},
+ {id:"shoe-jimmychoo",xp:110,cat:"shoe",name:"Jimmy Choo 水鑽高跟鞋",value:4*W,ico:"👠"},
+ {id:"dog-poodle",xp:120,cat:"dog",name:"紅貴賓犬「可可」",value:6*W,ico:"🐩"},
+ {id:"bag-lv-speedy",xp:130,cat:"bag",name:"LV Speedy 25 老花包",value:7*W,ico:"👜"},
+ {id:"jewel-akoya-pearl",xp:140,cat:"jewel",name:"Akoya 珍珠項鍊",value:12*W,ico:"📿"},
+ {id:"shoe-louboutin",xp:150,cat:"shoe",name:"Louboutin 紅底高跟鞋",value:5*W,ico:"👠"},
+ {id:"cloth-chanel-tweed",xp:160,cat:"cloth",name:"香奈兒 斜紋軟呢外套",value:28*W,ico:"🧥"},
+ {id:"art-monet-print",xp:170,cat:"art",name:"莫內《睡蓮》限量版畫",value:30*W,ico:"🖼️"},
+ {id:"dog-shiba",xp:180,cat:"dog",name:"柴犬「麻糬」",value:8*W,ico:"🐕"},
+ {id:"stock-tsmc",xp:200,cat:"stock",name:"台積電股票 1 張",value:110*W,ico:"📈",grow:1},
+ {id:"bag-lady-dior",xp:220,cat:"bag",name:"Dior Lady Dior 黛妃包",value:22*W,ico:"👜"},
+ {id:"jewel-cartier-love",xp:240,cat:"jewel",name:"Cartier Love 手環",value:25*W,ico:"💍"},
+ {id:"shoe-manolo",xp:260,cat:"shoe",name:"Manolo Blahnik 鑽扣緞面鞋",value:5*W,ico:"👡"},
+ {id:"stock-nvidia",xp:290,cat:"stock",name:"輝達 NVIDIA 股票 100 股",value:60*W,ico:"💹",grow:1},
+ {id:"bag-chanel-cf",xp:320,cat:"bag",name:"香奈兒 經典口蓋包",value:35*W,ico:"👜"},
+ {id:"dog-frenchie",xp:350,cat:"dog",name:"法國鬥牛犬「布丁」",value:10*W,ico:"🐶"},
+ {id:"jewel-vca-alhambra",xp:380,cat:"jewel",name:"梵克雅寶 四葉草項鍊",value:30*W,ico:"🍀"},
+ {id:"cloth-dior-bar",xp:420,cat:"cloth",name:"Dior Bar Jacket 套裝",value:45*W,ico:"👚"},
+ {id:"shoe-roger-vivier",xp:460,cat:"shoe",name:"Roger Vivier 水鑽方扣鞋",value:6*W,ico:"🥿"},
+ {id:"bag-hermes-kelly",xp:500,cat:"bag",name:"愛馬仕 Kelly 28 黑金",value:60*W,ico:"👜"},
+ {id:"dog-corgi",xp:550,cat:"dog",name:"柯基「吐司」",value:9*W,ico:"🐕"},
+ {id:"art-kusama-pumpkin",xp:610,cat:"art",name:"草間彌生《南瓜》版畫",value:150*W,ico:"🎃"},
+ {id:"jewel-tiffany-diamond",xp:660,cat:"jewel",name:"Tiffany 六爪鑽戒 2 克拉",value:180*W,ico:"💍"},
+ {id:"stock-apple",xp:730,cat:"stock",name:"蘋果 Apple 股票 100 股",value:80*W,ico:"🍎",grow:1},
+ {id:"bag-hermes-birkin",xp:800,cat:"bag",name:"愛馬仕 Birkin 30 金棕",value:90*W,ico:"👜"},
+ {id:"car-porsche-911",xp:880,cat:"car",name:"Porsche 911 Carrera",value:700*W,ico:"🚗"},
+ {id:"cloth-valentino-gown",xp:960,cat:"cloth",name:"Valentino 紅色晚禮服",value:60*W,ico:"👗"},
+ {id:"art-vangogh-sketch",xp:1050,cat:"art",name:"梵谷 鳶尾花素描",value:800*W,ico:"🌻"},
+ {id:"house-tokyo",xp:1150,cat:"house",name:"東京港區公寓",value:4500*W,ico:"🏙️"},
+ {id:"dog-afghan",xp:1250,cat:"dog",name:"阿富汗獵犬「香檳」",value:20*W,ico:"🦮"},
+ {id:"jewel-cartier-panthere",xp:1400,cat:"jewel",name:"Cartier 美洲豹鑽石胸針",value:600*W,ico:"🐆"},
+ {id:"car-bentley",xp:1500,cat:"car",name:"Bentley Continental GT",value:1500*W,ico:"🚙"},
+ {id:"cloth-haute-couture",xp:1650,cat:"cloth",name:"巴黎高訂晚禮服",value:300*W,ico:"👗"},
+ {id:"car-ferrari",xp:1850,cat:"car",name:"Ferrari Roma",value:1800*W,ico:"🏎️"},
+ {id:"house-xinyi",xp:2000,cat:"house",name:"信義區豪宅",value:2.8*Y,ico:"🏢"},
+ {id:"bag-hermes-himalaya",xp:2200,cat:"bag",name:"愛馬仕 喜馬拉雅鱷魚皮 Birkin",value:1200*W,ico:"👜"},
+ {id:"art-picasso",xp:2400,cat:"art",name:"畢卡索 肖像畫",value:3000*W,ico:"🎨"},
+ {id:"car-lamborghini",xp:2650,cat:"car",name:"Lamborghini Revuelto",value:3000*W,ico:"🏎️"},
+ {id:"stock-berkshire",xp:2900,cat:"stock",name:"波克夏 A 股 1 股",value:2000*W,ico:"💹",grow:1},
+ {id:"house-london",xp:3200,cat:"house",name:"倫敦梅費爾聯排別墅",value:6*Y,ico:"🏛️"},
+ {id:"car-rolls-royce",xp:3500,cat:"car",name:"Rolls-Royce Phantom",value:4500*W,ico:"🚘"},
+ {id:"art-klimt",xp:3850,cat:"art",name:"克林姆 金箔仕女畫",value:2*Y,ico:"🖼️"},
+ {id:"jewel-pink-diamond",xp:4200,cat:"jewel",name:"10 克拉粉紅鑽",value:3*Y,ico:"💎"},
+ {id:"house-provence",xp:4600,cat:"house",name:"南法蔚藍海岸別墅",value:8*Y,ico:"🏡"},
+ {id:"jet-riva",xp:5100,cat:"jet",name:"Riva 經典木質遊艇",value:1.2*Y,ico:"🚤"},
+ {id:"art-monet-original",xp:5600,cat:"art",name:"莫內《睡蓮》真跡",value:25*Y,ico:"🖼️"},
+ {id:"house-monaco",xp:6100,cat:"house",name:"摩納哥海景頂層公寓",value:12*Y,ico:"🏰"},
+ {id:"jet-superyacht",xp:6700,cat:"jet",name:"60 米超級遊艇",value:15*Y,ico:"🛥️"},
+ {id:"jet-g700",xp:7300,cat:"jet",name:"灣流 G700 私人飛機",value:25*Y,ico:"🛩️"},
+ {id:"car-bugatti",xp:8100,cat:"car",name:"Bugatti Chiron 超跑",value:9500*W,ico:"🏎️"},
+ {id:"art-warhol",xp:8800,cat:"art",name:"安迪·沃荷《夢露》絲網版畫",value:6*Y,ico:"🖼️"},
+ {id:"jewel-blue-diamond",xp:9700,cat:"jewel",name:"20 克拉皇家藍鑽",value:18*Y,ico:"💎"},
+ {id:"house-paris",xp:10600,cat:"house",name:"巴黎第 16 區奧斯曼豪宅",value:20*Y,ico:"🏛️"},
+ {id:"jet-megayacht",xp:11700,cat:"jet",name:"90 米巨型遊艇「永恆號」",value:60*Y,ico:"🛥️"},
+ {id:"art-davinci",xp:12800,cat:"art",name:"達文西 手稿真跡",value:80*Y,ico:"📜"},
+ {id:"house-island",xp:14000,cat:"house",name:"加勒比海私人島嶼",value:45*Y,ico:"🏝️"},
+ {id:"stock-tsmc-100",xp:15400,cat:"stock",name:"台積電股票 100 張",value:1.1*Y,ico:"📈",grow:1},
+ {id:"jewel-royal-tiara",xp:16900,cat:"jewel",name:"歐洲皇室古董鑽石冠冕",value:30*Y,ico:"👑"},
+ {id:"house-chateau",xp:18500,cat:"house",name:"法國羅亞爾河古堡",value:35*Y,ico:"🏰"}];
 const catName=c=>(CATS.find(x=>x[0]===c)||[,""])[1];
 const growPct=xp=>Math.round(Math.min(Math.max(xp,0),50000)/50000*80);       // 股票增值：每 625 XP +1%，上限 +80%
 const trValue=(t,xp)=>t.grow?Math.round(t.value*(1+growPct(xp)/100)/1000)*1000:t.value;
@@ -101,6 +124,7 @@ const owned=xp=>TREASURES.filter(t=>xp>=t.xp);
 const worth=xp=>owned(xp).reduce((a,t)=>a+trValue(t,xp),0);
 const SAYINGS=["優雅不是天生的，是每天練出來的。","今天多念一句，包包就離妳近一點。","真正的貴婦，連新聞標題都念得從容。","錢包可以空，英文不能空。","下午茶之前，先來一輪回音法。","學英文和買包一樣：越早開始越划算。","台積電會漲，妳的英文也會。","A lady never stops learning. 貴婦永遠在學習。","今天的口說，是明天和外國朋友聊天的底氣。","Step by step 一步一步來，豪宅也是一塊磚一塊磚蓋的。","狗狗在等妳下課，再念一遍就好。","氣質是存出來的，經驗值也是。"];
 function saying(){const d=new Date(),n=Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);return SAYINGS[n%SAYINGS.length]}
+let AVN=0;
 function avatar(L,sz){sz=sz||56;
  const SK="#f7d6c1",HR="#5b3a29",DR="#7c5cff";
  const bag="#e23d45",trim="#b4232c";
@@ -111,11 +135,50 @@ function avatar(L,sz){sz=sz||56;
  const sh=has(L,"cool")?{lens:"#16171c",rim:"#16171c"}:null;
  const shades=sh?`<path d="M22.5 23.500h8.300l-.8 3.600q-.5 1.9-2.4 1.900h-2.300q-2 0-2.4-1.900zM33.2 23.500h8.300l-.4 3.600q-.4 1.9-2.4 1.900h-2.300q-1.9 0-2.4-1.900z" fill="${sh.lens}" stroke="${sh.rim}" stroke-width="1.1" stroke-linejoin="round"/><path d="M30.8 24.300h2.4" stroke="${sh.rim}" stroke-width="1.2"/>`:'<circle cx="27.8" cy="26" r="1.2" fill="#3a2a2a"/><circle cx="36.2" cy="26" r="1.2" fill="#3a2a2a"/><path d="M25.8 23.600q2-1.3 4-.3M34.2 23.300q2-1 4 .3" fill="none" stroke="#5b3a29" stroke-width=".8" stroke-linecap="round"/>';
  const hat=`<circle cx="32" cy="8.5" r="5.2" fill="${HR}"/>`;
- const crown=L>=12&&has(L,"crown")?'<path d="M22.5 15.500l1.5-8 4.5 4.5 3.5-7.5 3.5 7.5 4.5-4.5 1.5 8z" fill="#f5b301" stroke="#c78a00" stroke-width="1" stroke-linejoin="round"/><circle cx="32" cy="5" r="1.6" fill="#e8463a"/><circle cx="27.8" cy="13" r="1" fill="#fff"/><circle cx="32" cy="13" r="1" fill="#bfe9ff"/><circle cx="36.2" cy="13" r="1" fill="#fff"/>':"";
+ const Lh=id=>has(L,id),u="rg"+(++AVN)+"_";
+ const star=(x,y,r,f,e)=>`<path d="M${x} ${y-r}Q${x} ${y} ${x+r} ${y}Q${x} ${y} ${x} ${y+r}Q${x} ${y} ${x-r} ${y}Q${x} ${y} ${x} ${y-r}z" fill="${f}" stroke="${e||"none"}" stroke-width=".4" stroke-linejoin="round"/>`;
+ const dia=(x,y,s,f,e)=>`<path d="M${x} ${y-s}l${s} ${s} ${-s} ${s} ${-s} ${-s}z" fill="${f}" stroke="${e||"none"}" stroke-width=".5" stroke-linejoin="round"/>`;
+ // 13+ 造型：珍珠／紅寶耳環、髮飾、禮服顏色、長手套、皮草、綬帶、披風、權杖、光環、星光
+ const dc=Lh("eternal")?`url(#${u}d)`:Lh("starry")?"#e9ecf7":Lh("queen")?"#5b2a9e":Lh("ruby")?"#a3203f":DR;
+ const dst=Lh("eternal")?' stroke="#f5b301" stroke-width="1"':Lh("starry")?' stroke="#aeb7d0" stroke-width="1"':Lh("empress")?' stroke="#f5b301" stroke-width="1.2"':"";
+ let defs="",back="";
+ if(Lh("eternal"))defs+=`<linearGradient id="${u}d" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9ad5"/><stop offset=".35" stop-color="#9ad8ff"/><stop offset=".7" stop-color="#b69cff"/><stop offset="1" stop-color="#8ff0d0"/></linearGradient><linearGradient id="${u}c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9defa"/></linearGradient>`;
+ if(Lh("halo")){const g=Lh("eternal")?["#fff3b8",.95,"#ffd86b",.55]:Lh("starry")?["#eaf4ff",.9,"#b8cfff",.5]:["#ffe9a0",.8,"#ffd25a",.4];
+  defs+=`<radialGradient id="${u}a"><stop offset=".3" stop-color="${g[0]}" stop-opacity="${g[1]}"/><stop offset=".7" stop-color="${g[2]}" stop-opacity="${g[3]}"/><stop offset="1" stop-color="${g[2]}" stop-opacity="0"/></radialGradient>`;
+  back+=`<circle cx="32" cy="32" r="31.5" fill="url(#${u}a)"/>`;
+  if(!Lh("starry")||Lh("eternal")){const n=Lh("eternal")?16:12;for(let k=0;k<n;k++){const a=k/n*6.2832,c=Math.cos(a),s=Math.sin(a);back+=`<path d="M${(32+c*21).toFixed(1)} ${(32+s*21).toFixed(1)}L${(32+c*31).toFixed(1)} ${(32+s*31).toFixed(1)}" stroke="${Lh("eternal")&&k%2?"#7fe3ff":"#f5b301"}" stroke-width="${Lh("eternal")?2:1.6}" stroke-linecap="round" opacity=".85"/>`}}}
+ if(Lh("empress"))back+=`<path d="M6 64C6.5 52 11 46 20 44.500L44 44.500C53 46 57.500 52 58 64z" fill="#3b1470" stroke="#f6f3ec" stroke-width="2.4" stroke-linejoin="round"/>`+[[7.5,60],[8.5,53],[12.5,47.5],[56.5,60],[55.5,53],[51.5,47.5]].map(p=>`<ellipse cx="${p[0]}" cy="${p[1]}" rx=".8" ry="1.1" fill="#16171c"/>`).join("");
+ let deco="";
+ if(Lh("sash"))deco+=`<path d="M23 51L46 63.500" stroke="#f5b301" stroke-width="5.600"/><path d="M23 51L46 63.500" stroke="#2f6fed" stroke-width="3.600"/><circle cx="38" cy="58.100" r="2.500" fill="#f5b301" stroke="#c78a00" stroke-width=".6"/><circle cx="38" cy="58.100" r="1" fill="#e8463a"/>`;
+ if(Lh("stole")){const fc=Lh("empress")?"#fbf8f1":"#fffdf6";deco+=[[15.5,58.5],[17.3,54.3],[20.8,51.2],[43.2,51.2],[46.7,54.3],[48.5,58.5]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.200" fill="${fc}" stroke="#c9c4b8" stroke-width=".7"/>`).join("");
+  if(Lh("empress"))deco+=[[17.3,54.3],[43.2,51.2],[15.5,58.5],[46.7,54.3]].map(p=>`<ellipse cx="${p[0]}" cy="${p[1]}" rx=".7" ry="1" fill="#16171c"/>`).join("")}
+ if(Lh("empress")&&!Lh("starry"))deco+=dia(26,60,2,"#f5b301","#c78a00")+dia(32,62,2,"#f5b301","#c78a00");
+ if(Lh("glove"))deco+=`<path d="M16.500 52.500L14 62" stroke="#b9bfd0" stroke-width="5.800" stroke-linecap="round"/><path d="M16.500 52.500L14 62" stroke="#fff" stroke-width="4.400" stroke-linecap="round"/><path d="M14.800 55.500h3.800" stroke="#b9bfd0" stroke-width=".8"/>`;
+ const earr=Lh("ruby")?[22.9,41.1].map(x=>`<path d="M${x} 32.200l1.300 1.500-1.300 2.100-1.300-2.100z" fill="#e0245e" stroke="#8a0f35" stroke-width=".6" stroke-linejoin="round"/>`).join(""):Lh("pearl")?[22.9,41.1].map(x=>`<circle cx="${x}" cy="33.600" r="1.700" fill="#fffdf6" stroke="#b9ad94" stroke-width=".6"/>`).join(""):"";
+ const bow=Lh("bow")?`<path d="M20.500 19.500l-5.500-3.800v7.600zM20.500 19.500l5.500-3.800v7.600z" fill="#ff6fa5" stroke="#c2185b" stroke-width=".8" stroke-linejoin="round"/><circle cx="20.500" cy="19.500" r="1.800" fill="#ffd1e3" stroke="#c2185b" stroke-width=".7"/>`:"";
+ const gloveR=Lh("glove")?`<path d="M50.200 45L45 52" stroke="#b9bfd0" stroke-width="5.200" stroke-linecap="round"/><path d="M50.200 45L45 52" stroke="#fff" stroke-width="3.800" stroke-linecap="round"/><ellipse cx="50.200" cy="43.800" rx="3" ry="2.400" fill="#fff" stroke="#b9bfd0" stroke-width=".7"/>`:"";
+ const scep=Lh("empress")?`<path d="M13 31L13 63" stroke="#c78a00" stroke-width="2.600" stroke-linecap="round"/><path d="M13 31L13 63" stroke="#f5b301" stroke-width="1.400" stroke-linecap="round"/><circle cx="13" cy="28" r="3.400" fill="#f5b301" stroke="#c78a00" stroke-width=".9"/><circle cx="13" cy="28" r="1.600" fill="${Lh("eternal")?"#bfe9ff":"#e8463a"}"/>`:"";
+ let spk="";
+ if(Lh("starry")){const sc=Lh("eternal")?["#fff3b8","#bfe9ff","#ffc2ea","#c9ffe8"]:["#fff3b8"];
+  [[9,13,3],[55,11,3.5],[7,38,2.5],[57,33,3],[14,24,1.8],[50,22,2]].forEach((p,i)=>spk+=star(p[0],p[1],p[2],sc[i%sc.length],"#d9a400"));
+  spk+=star(25,58,2,Lh("eternal")?"#fff":"#7aa7ff","#5b7fd1")+star(40,61,2.200,Lh("eternal")?"#fff":"#7aa7ff","#5b7fd1")+star(32,56.500,1.500,"#ffe08a","#d9a400")}
+ if(Lh("eternal"))[[4,24,1.5],[60,22,1.6],[5,50,1.6],[59,48,1.5],[32,3.5,1.4]].forEach(p=>spk+=star(p[0],p[1],p[2],"#fff","#7fa6d8"));
+ let crown="";
+ if(Lh("eternal")){const dm=(x,y,s)=>dia(x,y,s,"#e6f6ff","#4f94d6");
+  crown=`<path d="M18.500 16.500L16.500 6.500l7 4.500 2-7.500 6.500 5.500 6.500-5.500 2 7.500 7-4.500-2 10z" fill="url(#${u}c)" stroke="#6f9fd6" stroke-width="1" stroke-linejoin="round"/><path d="M16.500 6.500Q32-4 47.500 6.500" fill="none" stroke="#6f9fd6" stroke-width="1.200"/>`+dm(32,2,2.100)+dm(16.500,6.500,1.500)+dm(47.500,6.500,1.500)+dm(25.500,3.500,1.300)+dm(38.500,3.500,1.300)+dm(32,12,2.800)+dm(22.500,14,1.300)+dm(27,14.500,1.100)+dm(37,14.500,1.100)+dm(41.500,14,1.300)}
+ else if(Lh("empress")){const pr=(x,y)=>`<circle cx="${x}" cy="${y}" r="1.500" fill="#fffdf6" stroke="#b9ad94" stroke-width=".5"/>`;
+  crown=`<path d="M18.500 16.500L16.500 6.500l7 4.500 2-7.500 6.500 5.500 6.500-5.500 2 7.500 7-4.500-2 10z" fill="#f5b301" stroke="#c78a00" stroke-width="1" stroke-linejoin="round"/><path d="M16.500 6.500Q32-4 47.500 6.500" fill="none" stroke="#c78a00" stroke-width="1.400"/><circle cx="32" cy="1.900" r="1.900" fill="#e8463a" stroke="#c78a00" stroke-width=".7"/>`+pr(16.500,6.500)+pr(47.500,6.500)+pr(25.500,3.500)+pr(38.500,3.500)+`<circle cx="32" cy="12" r="2.200" fill="#b43bff" stroke="#6a1fa8" stroke-width=".6"/><circle cx="22.500" cy="14.200" r="1.100" fill="#e8463a"/><circle cx="27" cy="14.500" r="1" fill="#bfe9ff"/><circle cx="37" cy="14.500" r="1" fill="#bfe9ff"/><circle cx="41.500" cy="14.200" r="1.100" fill="#e8463a"/>`}
+ else if(Lh("queen")){const pr=(x,y)=>`<circle cx="${x}" cy="${y}" r="1.400" fill="#fffdf6" stroke="#b9ad94" stroke-width=".5"/>`;
+  crown=`<path d="M20.500 16L19 7.500l6 4 2-7.500 5 5.500 5-5.500 2 7.500 6-4-1.500 8.500z" fill="#f5b301" stroke="#c78a00" stroke-width="1" stroke-linejoin="round"/><path d="M32 2.500v5M29.800 4.600h4.400" stroke="#c78a00" stroke-width="1.300" stroke-linecap="round"/>`+pr(19,7.500)+pr(27,4)+pr(37,4)+pr(45,7.500)+`<circle cx="32" cy="13" r="2" fill="#b43bff" stroke="#6a1fa8" stroke-width=".6"/><circle cx="24.500" cy="14.200" r="1.100" fill="#e8463a"/><circle cx="39.500" cy="14.200" r="1.100" fill="#e8463a"/>`}
+ else if(Lh("tiara"))crown=`<path d="M23 15.500L22 9.500l4.300 3.300 2.300-7.300 3.400-4 3.400 4 2.300 7.300L42 9.500l-1 6z" fill="#f5b301" stroke="#c78a00" stroke-width=".9" stroke-linejoin="round"/><circle cx="32" cy="2.200" r="1.500" fill="#e8463a"/><circle cx="22" cy="9.500" r="1.100" fill="#fff"/><circle cx="42" cy="9.500" r="1.100" fill="#fff"/><circle cx="28.600" cy="5.800" r="1.100" fill="#ff9aa8"/><circle cx="35.400" cy="5.800" r="1.100" fill="#ff9aa8"/><circle cx="26" cy="14" r=".9" fill="#bfe9ff"/><circle cx="29" cy="13.800" r=".9" fill="#fff"/><circle cx="32" cy="13.500" r="1" fill="#e8463a"/><circle cx="35" cy="13.800" r=".9" fill="#fff"/><circle cx="38" cy="14" r=".9" fill="#bfe9ff"/>`;
+ else if(L>=12&&Lh("crown"))crown='<path d="M22.5 15.500l1.5-8 4.5 4.500 3.5-7.500 3.500 7.500 4.500-4.500 1.500 8z" fill="#f5b301" stroke="#c78a00" stroke-width="1" stroke-linejoin="round"/><circle cx="32" cy="5" r="1.600" fill="#e8463a"/><circle cx="27.800" cy="13" r="1" fill="#fff"/><circle cx="32" cy="13" r="1" fill="#bfe9ff"/><circle cx="36.200" cy="13" r="1" fill="#fff"/>';
  const bagSvg=`<path d="M46 46.500c0-7 8.5-7 8.5 0" fill="none" stroke="${trim}" stroke-width="1.8"/><rect x="42.5" y="46" width="15.5" height="11.5" rx="2.6" fill="${bag}" stroke="${trim}" stroke-width="1"/><path d="M42.8 50.200h15" stroke="${trim}" stroke-width="1"/><rect x="48.7" y="48.7" width="3.2" height="3.2" rx=".8" fill="#ffe08a" stroke="${trim}" stroke-width=".6"/>`;
- const svg=`<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" aria-hidden="true"><path d="M19.5 26c0-9.5 5.5-15 12.5-15s12.5 5.5 12.5 15c0 6 1 12 3.5 17h-32c2.5-5 3.5-11 3.5-17z" fill="${HR}"/><path d="M12.5 64c0-11 8-17 19.5-17s19.5 6 19.5 17z" fill="${DR}"/><path d="M28.5 34h7v11.500h-7z" fill="${SK}"/><path d="M24 46.600q8 9.5 16 0-8-2.2-16 0z" fill="${SK}"/><ellipse cx="32" cy="25.5" rx="9.3" ry="10.3" fill="${SK}"/><path d="M22 25c.5-8.5 5.5-12 10-12s9.5 3.5 10 12c-4.5-1.5-8-4.5-10-8-2 3.5-5.5 6.5-10 8z" fill="${HR}"/><circle cx="22.9" cy="30.5" r="1.3" fill="#fffdf6" stroke="#b9ad94" stroke-width=".5"/><circle cx="41.1" cy="30.5" r="1.3" fill="#fffdf6" stroke="#b9ad94" stroke-width=".5"/><circle cx="26.3" cy="30" r="1.7" fill="#ff9aa8" opacity=".45"/><circle cx="37.7" cy="30" r="1.7" fill="#ff9aa8" opacity=".45"/><path d="M29.3 31.800q2.7 2.3 5.4 0q-2.7-1-5.4 0z" fill="#d6336c" stroke="#d6336c" stroke-width=".8" stroke-linejoin="round"/>${shades}${neck}${hat}${crown}${bagSvg}</svg>`;
+ const svg=`<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" aria-hidden="true">${defs?"<defs>"+defs+"</defs>":""}${back}<path d="M19.5 26c0-9.5 5.5-15 12.5-15s12.5 5.5 12.5 15c0 6 1 12 3.5 17h-32c2.5-5 3.5-11 3.5-17z" fill="${HR}"/><path d="M12.5 64c0-11 8-17 19.5-17s19.5 6 19.5 17z" fill="${dc}"${dst}/>${deco}<path d="M28.5 34h7v11.500h-7z" fill="${SK}"/><path d="M24 46.600q8 9.5 16 0-8-2.2-16 0z" fill="${SK}"/><ellipse cx="32" cy="25.5" rx="9.3" ry="10.3" fill="${SK}"/><path d="M22 25c.5-8.5 5.5-12 10-12s9.5 3.5 10 12c-4.5-1.5-8-4.5-10-8-2 3.5-5.5 6.5-10 8z" fill="${HR}"/><circle cx="22.9" cy="30.5" r="1.3" fill="#fffdf6" stroke="#b9ad94" stroke-width=".5"/><circle cx="41.1" cy="30.5" r="1.3" fill="#fffdf6" stroke="#b9ad94" stroke-width=".5"/><circle cx="26.3" cy="30" r="1.7" fill="#ff9aa8" opacity=".45"/><circle cx="37.7" cy="30" r="1.7" fill="#ff9aa8" opacity=".45"/><path d="M29.3 31.800q2.7 2.3 5.4 0q-2.7-1-5.4 0z" fill="#d6336c" stroke="#d6336c" stroke-width=".8" stroke-linejoin="round"/>${shades}${neck}${earr}${hat}${bow}${crown}${bagSvg}${gloveR}${scep}${spk}</svg>`;
+ // 頭像框：Lv20 起改成漸層框（紫金→金紫→光暈→銀白→極光），其餘沿用單色
  const fr=has(L,"gold")?"#f5b301":has(L,"silver")?"#b8c0cc":has(L,"bronze")?"#e0958a":"var(--ln)";
- return `<span class="rp-av" style="width:${sz+10}px;height:${sz+10}px;border-color:${fr}">${svg}</span>`}
+ const gb=g=>`border-color:transparent;background:linear-gradient(var(--cd,#fff),var(--cd,#fff)) padding-box,${g} border-box;`;
+ const fs=Lh("eternal")?gb("conic-gradient(#5ef0d0,#7c9cff,#e66bff,#ff9ad5,#ffd36b,#5ef0d0)")+`box-shadow:0 0 ${Math.round(sz/4)}px #7fe3ffaa,0 0 ${Math.round(sz/8)}px #ff9ad5aa;`:Lh("starry")?gb("conic-gradient(#fff,#b8c8e8,#fff,#9fb4dc,#fff)")+`box-shadow:0 0 ${Math.round(sz/5)}px #b8cfffcc;`:Lh("halo")?gb("conic-gradient(#f5b301,#7c3fd1,#fff1b0,#f5b301,#7c3fd1,#f5b301)")+`box-shadow:0 0 ${Math.round(sz/5)}px #f5b301bb;`:Lh("empress")?gb("conic-gradient(#f5b301,#7c3fd1,#fff1b0,#f5b301,#7c3fd1,#f5b301)")+"box-shadow:0 0 0 2px #f5b30166;":Lh("queen")?gb("linear-gradient(135deg,#7c3fd1,#f5b301 50%,#7c3fd1)"):`border-color:${fr};`;
+ return `<span class="rp-av" style="width:${sz+10}px;height:${sz+10}px;${fs}">${svg}</span>`}
 const css=document.createElement("style");css.textContent=`
 .rp-av{display:inline-flex;align-items:center;justify-content:center;border:4px solid;border-radius:50%;background:var(--cd,#fff);flex:0 0 auto}
 .rp-bar{height:10px;border-radius:99px;background:var(--ln);overflow:hidden}.rp-bar i{display:block;height:100%;background:linear-gradient(90deg,#7c5cff,#2f6fed);border-radius:99px;transition:width .6s}
@@ -183,7 +246,7 @@ const css=document.createElement("style");css.textContent=`
 document.head.appendChild(css);
 function beep(){try{const A=window.AudioContext||window.webkitAudioContext;const c=new A();[523,659,784,1047].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(.0001,c.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.18,c.currentTime+i*.12+.02);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.12+.3);o.connect(g).connect(c.destination);o.start(c.currentTime+i*.12);o.stop(c.currentTime+i*.12+.32)});setTimeout(()=>c.close(),1500)}catch(e){}}
 function levelUp(L){const t=title(L),nw=ABIL.filter(a=>a.lv===L);const d=document.createElement("div");d.className="rp-up";
- d.innerHTML=`<div>${avatar(L,80)}<div style="font-weight:800;color:#7c5cff;margin-top:6px">晉級！</div><h2>Lv ${L}</h2><div style="font-size:20px;font-weight:800">${t[0]}｜${t[1]}</div>${nw.length?'<div style="margin-top:8px">解鎖：'+nw.map(a=>"<b>"+a.name+"</b>").join("、")+"</div>":""}</div>`;
+ d.innerHTML=`<div>${avatar(L,L>12?96:80)}<div style="font-weight:800;color:#7c5cff;margin-top:6px">晉級！</div><h2>Lv ${L}</h2><div style="font-size:20px;font-weight:800">${t[0]}｜${t[1]}</div>${nw.length?'<div style="margin-top:8px">解鎖：'+nw.map(a=>"<b>"+a.name+"</b>").join("、")+"</div>":""}</div>`;
  d.onclick=()=>d.remove();document.body.appendChild(d);setTimeout(()=>d.remove(),3300);beep();
  for(let k=0;k<20;k++){const c=document.createElement("span");c.className="rw-cf";c.textContent=["⭐","✨","💎","👜"][k%4];c.style.left=Math.random()*100+"vw";c.style.animationDelay=Math.random()*.5+"s";document.body.appendChild(c);setTimeout(()=>c.remove(),2600)}}
 function pop(txt){const e=document.createElement("div");e.className="rp-xp";e.textContent=txt;document.body.appendChild(e);setTimeout(()=>e.remove(),1300)}
@@ -245,12 +308,12 @@ function drawAssets(){const a=document.getElementById("assets");if(!a)return;con
 function home(el){migrate();homeEl=el;const draw=()=>{const s=st(),v=lvOf(s.xp),t=title(v.L);const[mx,left]=hints();const mxA=Math.max(1,...Object.keys(ATTR).map(a=>s.at[a]||0));
  el.innerHTML=`<div class="rp-card" id="rpg"><div class="rp-row">${avatar(v.L,64)}<div style="flex:1"><div style="font-size:13px;color:var(--mu)">💎 貴婦系統</div><div style="font-size:22px;font-weight:900">Lv ${v.L}　${t[0]}</div><div style="font-weight:700">${t[1]}</div></div></div>
  <div id="assets"></div>
- <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:10px;color:var(--mu)"><span>經驗值 ${v.cur} / ${v.nx}</span><span>總 XP ${s.xp}</span></div><div class="rp-bar"><i style="width:${Math.round(v.cur/v.nx*100)}%"></i></div>
+ <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:10px;color:var(--mu)"><span>${v.max?"經驗值 👑 滿級 Lv "+MAXLV:"經驗值 "+v.cur+" / "+v.nx}</span><span>總 XP ${s.xp}</span></div><div class="rp-bar"><i style="width:${Math.round(v.cur/v.nx*100)}%"></i></div>
  <div class="rp-at">${Object.entries(ATTR).map(([a,n])=>`<span>${n}</span><div class="rp-bar"><i style="width:${Math.round((s.at[a]||0)/mxA*100)}%;background:linear-gradient(90deg,#1a9a5a,#7ad38f)"></i></div><span style="font-size:12px">Lv${attrLv(s.at[a])} +${attrBonus(s.at[a])}%</span>`).join("")}</div>
  <div style="font-size:13px;margin-top:10px">今日：練習 ${s.day.n} 次${has(v.L,"daily")?"（早午餐加倍剩 "+Math.max(0,10-s.day.n)+" 次）":""}・提示 ${left}/${mx}・目前連續答對 ${s.combo}（最佳 ${s.best}）</div>
  <details class="rwr" style="margin-top:8px"><summary>升級規則</summary>
  XP：聽新卡 10（重聽 3）・答對 15（同題再答 8）・答錯 3・口說 12（重複 5）・課文新句 8（重聽 3）・題型全部完成 +50・單元全部完成 +150。<br>
  屬性：課文跟讀→聽力、口說→口說、單字卡和測驗→詞彙（念例句也算單字練習 XP）。屬性每升 1 級，該類 XP +2%（上限 30%）。<br>
  能力：${ABIL.map(a=>"Lv"+a.lv+" "+a.name+"："+a.desc).join("；")}。<br>${s.migXP?"已把之前的💵和練習紀錄換算成 "+s.migXP+" XP。":""}<br>寶藏會依累計 XP 自動開箱，經驗值不會被花掉。</details></div>`;drawAssets()};draw();RPG.onChange=draw;trCheck()}
-window.RPG={page,home,st,lvOf,need,gain,hints,TITLES,ABIL,TREASURES,CATS,trValue,money,worth};
+window.RPG={page,home,st,lvOf,need,gain,hints,avatar,TITLES,ABIL,TREASURES,CATS,trValue,money,worth};
 })();

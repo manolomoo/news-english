@@ -67,6 +67,7 @@ texts:[
   ["Rich Lee 開了 Wild Fox，要把日本的咖啡文化和稀有的咖啡豆帶到灣區。","這家店最貴的一杯，用的是在巴西為參賽而栽種的咖啡果。"],
   ["這些咖啡果在缺氧槽中發酵 72 小時，接著在東京烘焙。","Lee 說，這款咖啡的收成與在競賽中的聲望，說明了它的價格。"]],
  vocab:[["triple-digit"],["commodity"],["be about to do something"],["stack up"],["drip coffee"],["fruitiness"],["pricey","價格高的、貴重的（課文用 priciest）"],["blend"],["competition"],["ferment","（使）發酵（課文用 fermented）"],["roast","烘、烤、焙（課文用 roasted）"],["harvest",null,6],["competitive"],["prestige"],["difference","差別、不同",1],["unique","獨特的、獨一無二的",2],["pink dot","粉紅點（咖啡杯上的標記）",3],["sour","酸的",4],["culture","文化",5],["a hint of","一絲、些微"],["oxygen-deprived","缺氧的"],["washed process","水洗處理法（咖啡豆處理方式）"]],
+ photo:"img/week01-coffee.jpg",photopos:"50% 50%",photocap:"照片：Kim Sanso／Wikimedia Commons，授權 CC0（圖為一般手沖咖啡，僅作示意）",
  title:"一杯 105 美元的咖啡",tag:"Video Listening & Speaking（講義第 5 頁）",paras:[
  ["I never thought I would pay $105 for a cup of coffee.","So what makes this coffee worth triple digits, and can I even taste the {1|difference}?"],
  ["It's not commodity coffee where [[(which)]] you get a bag at the grocery store.","It's something that's very special, and that's why it's so expensive."],
@@ -79,17 +80,20 @@ texts:[
 {id:"flash",zh:[
   ["紐約馬拉松的一名年輕跑者，在距離終點線兩英里處倒下身亡"]],
  vocab:[["collapse","（因力竭、疾病或暈眩而）突然倒下、昏倒（標題用 collapses）"],["marathon runner"],["finish line","終點線"]],
+ photo:"img/week01-flash.jpg",photopos:"50% 40%",photocap:"照片：Martineric from Lille, France／Wikimedia Commons，授權 CC BY-SA 2.0（紐約馬拉松賽事示意）",
  title:"快訊標題：紐約馬拉松",tag:"Flash News Focus（講義第 15 頁）",paras:[
  ["Young NYC Marathon runner collapses and dies two miles from finish line"]]},
 {id:"patch",zh:[
   ["科學家最近發現，位於北太平洋、介於加州與夏威夷之間的大太平洋垃圾帶，含有大量塑膠廢棄物，甚至可能正在改變海水的顏色。","研究人員注意到，這一帶的海水變得更亮了。","大型垃圾會分解成數十億片細小碎片，漂浮在海面附近。","這些細小的塑膠對陽光的反射方式和乾淨海水不同，造成了這種肉眼可見的海洋顏色變化。","環保團體正努力收集並清除垃圾，但塑膠污染的規模龐大，仍是嚴峻的全球挑戰。"]],
  vocab:[["contain"],["reflect"],["visible"],["environmental"],["scale"],["plastic waste","塑膠廢棄物"],["break down","分解、破碎"],["float","漂浮"],["massive","巨大的、大規模的"],["pollution","污染"]],
+ photo:"img/week01-patch.jpg",photopos:"50% 50%",photocap:"地圖：L. Lebreton et al.／Wikimedia Commons，授權 CC BY 4.0（太平洋海面塑膠濃度示意）",
  title:"Great Pacific Garbage Patch",tag:"News Insights 1（講義第 16 頁）",paras:[
  ["Scientists recently discovered that the Great Pacific Garbage Patch, located in the North Pacific Ocean between California and Hawaii, contains so much plastic waste that it may actually be changing the color of the sea.","Researchers noticed that the water in this area has become brighter.","Large trash breaks down into billions of tiny pieces floating near the surface.","These tiny plastic reflect sunlight differently than clean seawater, causing this visible shift in ocean color.","Environmental groups are working hard to collect and remove the trash, but the massive scale of plastic pollution remains a serious global challenge."]],
  q:"Why is the ocean water in the Great Pacific Garbage Patch changing its color to a brighter blue-green?",a:"It is changing because billions of tiny broken-down plastic pieces floating near the surface reflect sunlight differently than clean water."},
 {id:"brunei",zh:[
   ["汶萊是亞洲最小的國家之一，因為擁有豐富的野生動物而受到關注，境內有超過 500 種鳥類，以及（講義原文在此中斷）。","雖然是個小國，這個國家仍讓約 70% 的土地維持被原始雨林覆蓋，讓稀有的動植物得以安全生存。","除了綠意盎然的景色與寧靜的河流，汶萊也保存著文化傳統，例如色彩繽紛的節慶與編織工藝。","如今，這個寧靜的國家吸引了熱愛大自然的人與旅客，他們想同時體驗野生自然與獨特的在地文化遺產。"]],
  vocab:[["primary"],["landscape"],["weave","編織（課文用 weaving）"],["heritage"],["species","物種、種類"],["rainforest","雨林"],["preserve","保存、保護"]],
+ photo:"img/week01-brunei.jpg",photopos:"50% 50%",photocap:"照片：Pangalau／Wikimedia Commons，授權 CC BY-SA 4.0（汶萊烏魯天補隆雨林）",
  title:"Brunei",tag:"News Insights 2（講義第 17 頁）",paras:[
  ["Brunei, one of the smallest nations in Asia, is gaining attention for its rich wildlife because it is home to more than 500 bird species and.","Although it is a small country, the country has kept around 70 percent of its land covered in primary rainforest, allowing rare animals and plants to survive safely.","In addition to its green landscapes and peaceful rivers, Brunei also preserves cultural traditions, such as colorful festivals and weaving.","Today, this peaceful nation attracts nature lovers and travelers looking to experience both wild nature and unique local heritage."]],
  note:"講義原文在 “500 bird species and.” 就是這樣寫的，這裡照原樣呈現。",
@@ -97,6 +101,7 @@ texts:[
 {id:"bushby",zh:[
   ["英國冒險家卡爾·布什比（Karl Bushby）走遍世界，歷時 28 年的不可思議旅程後，終於回到英格蘭的家鄉。","他在 1998 年、29 歲時於南美洲展開這場冒險，並承諾在步行回到家鄉之前，絕不使用任何交通工具。","11 月 2 日，這位 57 歲的旅人推著他的裝備推車來到母親家門前，數百人在那裡為他歡呼。","他 75 歲的母親含著喜悅的淚水擁抱他，並開玩笑地問：「你跑到哪裡去了？」","在這段漫長的旅程中，他走了將近 6 萬公里，橫越四大洲。"]],
  vocab:[["adventure"],["adventurer"],["gear"],["continent"],["incredible"],["vehicle","交通工具、車輛"],["doorstep","家門口"],["hometown","家鄉"],["cheer","歡呼、喝采"]],
+ photo:"img/week01-bushby.jpg",photopos:"50% 30%",photocap:"照片：Hullian111／Wikimedia Commons，授權 CC BY-SA 4.0（Karl Bushby 返抵 Hull）",
  title:"Karl Bushby",tag:"News Insights 3（講義第 18 頁）",paras:[
  ["British adventurer Karl Bushby has finally returned home to England after an incredible 28-year journey walking around the world.","He started his adventure in South America in 1998 when he was 29 years old, promising not to use any vehicles until he walked back to his hometown.","On November 2, the 57-year-old traveler pushed his gear cart to his mother's doorstep, where hundreds of people cheered for him.","His 75-year-old mother hugged him with tears of joy, asking jokingly, \"Where have you been?\"","During this long journey, he walked nearly 60,000 kilometers across four continents."]],
  q:"What promise did Karl Bushby keep throughout his 28-year journey across four continents until he reached his hometown?",a:"He promised not to use any vehicles and to complete the entire unbroken journey solely on foot."}

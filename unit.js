@@ -45,6 +45,7 @@ function vocabHTML(t){return (t.vocab||[]).map(v=>{const c=CARD[v[0]],zh=v[1]||(
 function textsHTML(){return W.texts.map(t=>{const ids=[];const body=t.paras.map((p,pi)=>`<div class="pa">`+p.map((s,si)=>{const j=sj++;const pl=plain(s);SENT.push(pl);ids.push(j);return `<div class="sn" id="s${j}" data-j="${j}">${fmt(s)}${zhOf(t,pi,si)}</div>`}).join("")+`</div>`).join("");
   t.ids=ids;
   return `<div class="box tx" id="tx-${t.id}"><b style="font-size:18px">${esc(t.title)}</b><div class="mu" style="font-size:13px">${esc(t.tag)}</div>
+  ${t.photo?`<figure class="ph"><img src="${esc(t.photo)}" alt="${esc(t.title)}" loading="lazy" style="object-position:${esc(t.photopos||"50% 50%")}" onerror="this.parentNode.style.display='none'"><figcaption>${esc(t.photocap||"")}</figcaption></figure>`:""}
   <div class="row"><button class="b p" data-a="all">▶ 全文連播</button><button class="b" data-a="echo">回音法逐句</button><button class="b" data-a="stop">⏹ 停止</button></div><div class="cue" style="min-height:20px"></div>
   ${t.zh?`<div class="row"><button class="b" data-a="zh">顯示中文</button></div>`:""}
   <div class="story">${body}</div>${t.note?`<div class="mu" style="font-size:13px">${esc(t.note)}</div>`:""}<div class="mu" style="font-size:12px">點任一句可單獨聽。</div>${t.vocab?`<div class="vl"><b>本篇較難單字</b>${vocabHTML(t)}</div>`:""}</div>`}).join("")}
