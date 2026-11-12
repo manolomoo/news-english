@@ -37,3 +37,8 @@ a.nav{color:var(--ac)}
 .bc .cue:empty{display:none}
 
 .ph{margin:10px 0;padding:0}.ph img{display:block;width:100%;height:180px;object-fit:cover;border-radius:12px}.ph figcaption{font-size:11px;color:var(--mu);margin-top:4px;line-height:1.4}
+/* 單字頁：分組按鈕（簡稱＋張數）與大卡插圖 */
+#grp{flex-wrap:nowrap}#grp button{flex:1 1 0;min-width:0;padding:6px 4px;font-size:15px;line-height:1.2;white-space:nowrap}#grp button small{display:block;font-size:12px;font-weight:600;opacity:.85}
+.bc .ic{width:68px;height:68px;margin:0 auto 2px}.bc .ic:empty{display:none}.bc .ic svg{display:block;width:100%;height:100%;border-radius:12px}
+.bc{padding:10px 14px;gap:3px}
+.ca .ci{width:38px;height:38px;margin:22px auto 8px}.ca .ci svg{display:block;width:100%;height:100%;border-radius:10px}.ca:has(.ci){padding-top:10px}

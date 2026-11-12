@@ -10,13 +10,13 @@ const key=c=>c.say||c.w;
 const list=()=>G[g].cards;
 const ALL=G.flatMap(x=>x.cards);
 /* 起始卡：該組 pget 最小者（同分取講義順序最前），不重排卡片 */
-function startIdx(){const L=list();let b=0,m=Infinity;for(let k=0;k<L.length;k++){const n=RW.pget(W.uid+"|cards|"+key(L[k]))||0;if(n<m){m=n;b=k}}return b}
+function startIdx(k=g){const L=G[k].cards;let b=0,m=Infinity;for(let k=0;k<L.length;k++){const n=RW.pget(W.uid+"|cards|"+key(L[k]))||0;if(n<m){m=n;b=k}}return b}
 function pickStart(){if(playing)return;i=startIdx();render()}
 function play1(k){return TTS.play(k,rate)}
 const wait=s=>{const t=TTS.sess();return new Promise(r=>setTimeout(()=>r(TTS.sess()===t),s*1000))};
 async function seq(keys){let t=0;for(const k of keys){const d=await play1(k);if(d==null)return t;t+=d}return t}
 function seg(el,opts,sel,on){el.innerHTML="";opts.forEach((o,k)=>{const b=document.createElement("button");b.textContent=o;if(k===sel)b.className="on";b.onclick=()=>{on(k);seg(el,opts,k,on)};el.appendChild(b)})}
-function cueEl(el,p,lb){el.textContent=(p?lb||"":"")+({listen:"聽",echo:"回音・心裡默念",shadow:"跟讀・大聲說出來"}[p]||"按「回音法播放」開始");el.style.color=p==="shadow"?"var(--ac)":p?"":"var(--mu)"}
+function cueEl(el,p,lb){el.textContent=(p?lb||"":"")+({listen:"聽",echo:"回音・心裡默念",shadow:"跟讀・大聲說出來"}[p]||"");el.style.color=p==="shadow"?"var(--ac)":""}
 const setCue=(p,lb)=>cueEl($("cue"),p,lb);
 function clearHl(){document.querySelectorAll(".sn.hl").forEach(e=>e.classList.remove("hl"));document.querySelectorAll(".tx .cue").forEach(e=>{e.textContent="";})}
 /* 回音法節奏（史嘉琳 Echo Method）：聽完短句 → 腦中「重播」一次（≈原速，故等於語音長度 d）→ 再大聲跟讀（略長於 d，給開口時間）。
@@ -25,11 +25,11 @@ const echoGap=d=>Math.max(1,d+.3),shadowGap=d=>Math.max(1.5,d*1.25+.6);
 function stop(){TTS.cancel();run++;playing=false;setCue("");clearHl();render()}
 async function once(keys){stop();await seq(keys)}
 /* ===== 單字圖卡 ===== */
-function grid(){$("ga").innerHTML=list().map((c,k)=>`<div class="ca${k===i?" cur":""}" data-k="${k}"><span class="sp">🔊</span><div class="en">${esc(c.w)}</div><div class="zh">${esc(c.zq||c.zh||"")}</div><div class="tg">${esc(c.pos.split(/[,，（(\[]/)[0].trim())}</div></div>`).join("");
+function grid(){$("ga").innerHTML=list().map((c,k)=>`<div class="ca${k===i?" cur":""}" data-k="${k}"><span class="sp">🔊</span>${(window.ICONS&&window.ICONS[c.w])?`<div class="ci">${window.ICONS[c.w]}</div>`:""}<div class="en">${esc(c.w)}</div><div class="zh">${esc(c.zq||c.zh||"")}</div><div class="tg">${esc(c.pos.split(/[,，（(\[]/)[0].trim())}</div></div>`).join("");
  $("ga").querySelectorAll(".ca").forEach(el=>el.onclick=()=>{stop();i=+el.dataset.k;render();once([key(list()[i])])})}
 function cardKeys(c){return c.ex?[key(c),c.ex]:[key(c)]}
-function render(){const L=list();if(i>=L.length)i=0;const c=L[i];$("pl").textContent=playing?"⏸ 暫停":"▶ 回音法播放";$("pos").textContent=G[g].name+"　"+(i+1)+" / "+L.length;
- $("w").textContent=c.w;$("tag").innerHTML=esc(c.pos.split(/[,，（(\[]/)[0].trim());$("ipa").textContent="";
+function render(){const L=list();if(i>=L.length)i=0;const c=L[i];$("pl").textContent=playing?"⏸ 暫停":"▶ 回音法播放";grpLabels();
+ $("ic").innerHTML=(window.ICONS&&window.ICONS[c.w])||"";$("w").textContent=c.w;$("tag").innerHTML=esc(c.pos.split(/[,，（(\[]/)[0].trim());$("ipa").textContent="";
  $("def").textContent="";$("zh").textContent=c.zh||"";
  $("ex").innerHTML=c.ex?`<div>${esc(c.ex)}</div><div class="mu">${esc(c.exzh||"")}</div>`+(c.ex2?`<div style="margin-top:6px">${esc(c.ex2)}</div><div class="mu">${esc(c.ex2zh||"")}</div>`:""):"";
  grid()}
@@ -89,7 +89,12 @@ $("o1").onclick=()=>once([key(list()[i])]);$("o2").onclick=()=>{const e=list()[i
 $("pv").onclick=()=>{stop();i=(i-1+list().length)%list().length;render()};$("nx").onclick=()=>{stop();i=(i+1)%list().length;render()};$("pl").onclick=()=>playing?stop():play();
 $("texts").innerHTML=textsHTML();bindTexts();
 $("syn").innerHTML=synHTML();$("syn").querySelectorAll("tr").forEach(tr=>tr.onclick=()=>once([W.syn[+tr.dataset.k][0]]));
-seg($("grp"),G.map(x=>x.name),g,k=>{stop();g=k;i=startIdx();render()});
+const GN={"咖啡篇單字":"咖啡篇","快報焦點":"焦點快報","洞察篇單字":"洞察篇"};
+const gLast=G.map(()=>-1);
+/* 分組按鈕：簡稱＋張數。選中組用目前 i，其他組用上次停留張數（沒去過則該組的起始張，同 startIdx 規則） */
+function grpLabels(){gLast[g]=i;G.forEach((x,k)=>{const b=$("grp").children[k];if(!b)return;const n=x.cards.length,cur=k===g?i:(gLast[k]>=0?gLast[k]:startIdx(k));
+ b.innerHTML=esc(GN[x.name]||x.name)+"<small>"+(cur+1)+"/"+n+"</small>";b.className=k===g?"on":""})}
+(function(){const el=$("grp");el.innerHTML="";G.forEach((x,k)=>{const b=document.createElement("button");b.onclick=()=>{stop();g=k;i=startIdx();render()};el.appendChild(b)})})();
 seg($("rate"),R.map(r=>r+"x"),R.indexOf(rate),k=>{rate=R[k]});
 seg($("dkseg"),DK.map(x=>x.name),dk,k=>{stop();dk=k;di=0;drill()});
 if(!TTS.supported())$("nov").style.display="";
