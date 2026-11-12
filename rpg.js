@@ -182,11 +182,11 @@ function avatar(L,sz){sz=sz||56;
 const css=document.createElement("style");css.textContent=`
 .rp-av{display:inline-flex;align-items:center;justify-content:center;border:4px solid;border-radius:50%;background:var(--cd,#fff);flex:0 0 auto}
 .rp-bar{height:10px;border-radius:99px;background:var(--ln);overflow:hidden}.rp-bar i{display:block;height:100%;background:linear-gradient(90deg,#7c5cff,#2f6fed);border-radius:99px;transition:width .6s}
-.rp-mini{position:fixed;left:12px;bottom:12px;z-index:96;background:var(--cd,#fff);border:1px solid var(--ln);border-radius:16px;padding:6px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px #0003;color:var(--fg);width:176px}
+.rp-mini{position:fixed;right:12px;top:12px;z-index:96;background:var(--cd,#fff);border:1px solid var(--ln);border-radius:16px;padding:6px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px #0003;color:var(--fg);width:176px}body:has(.rp-mini) .wk-top{padding-right:188px;min-height:58px;align-items:center}body:has(.rp-mini) .wk h1{white-space:normal;flex-wrap:wrap}
 .rp-go{display:flex;align-items:center;gap:6px;flex:1 1 auto;min-width:0;color:inherit;text-decoration:none}
 .rp-mini .rp-av{border-width:3px}.rp-mini b{font-size:13px}.rp-mini .rp-bar{height:7px;margin-top:3px}
-.rp-xp{position:fixed;left:40px;bottom:64px;z-index:97;font-weight:900;font-size:20px;color:#7c5cff;pointer-events:none;animation:rpx 1.3s ease forwards;text-shadow:0 1px 0 #fff}
-@keyframes rpx{0%{opacity:0;transform:translateY(10px) scale(.7)}20%{opacity:1;transform:translateY(0) scale(1.15)}100%{opacity:0;transform:translateY(-70px)}}
+.rp-xp{position:fixed;right:40px;top:64px;z-index:97;font-weight:900;font-size:20px;color:#7c5cff;pointer-events:none;animation:rpx 1.3s ease forwards;text-shadow:0 1px 0 #fff}
+@keyframes rpx{0%{opacity:0;transform:translateY(-8px) scale(.7)}20%{opacity:1;transform:translateY(0) scale(1.15)}100%{opacity:0;transform:translateY(40px)}}
 .rp-up{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:#0008;animation:rpf 3.2s ease forwards}
 .rp-up>div{background:var(--cd,#fff);color:var(--fg);border-radius:22px;padding:22px 26px;text-align:center;border:3px solid #7c5cff;max-width:86vw;animation:rpz .5s cubic-bezier(.2,1.6,.4,1)}
 .rp-up h2{margin:6px 0;font-size:30px;background:linear-gradient(90deg,#7c5cff,#f5b301);-webkit-background-clip:text;color:transparent}
@@ -239,7 +239,7 @@ const css=document.createElement("style");css.textContent=`
 .rp-box button.go{background:#7c5cff;border-color:#7c5cff;color:#fff}
 @media(prefers-color-scheme:dark){.rp-box .v{color:#f5c542}}
 @keyframes rpbf{from{opacity:0}to{opacity:1}}
-.rp-toast{position:fixed;left:12px;bottom:78px;z-index:101;display:flex;align-items:center;gap:8px;min-height:48px;max-width:min(300px,calc(100vw - 24px));padding:7px 14px 7px 10px;border-radius:16px;background:var(--cd,#fff);color:var(--fg);border:2px solid #f5b301;box-shadow:0 4px 16px #0004;cursor:pointer;animation:rptn .35s cubic-bezier(.2,1.5,.4,1)}
+.rp-toast{position:fixed;right:12px;top:78px;z-index:101;display:flex;align-items:center;gap:8px;min-height:48px;max-width:min(300px,calc(100vw - 24px));padding:7px 14px 7px 10px;border-radius:16px;background:var(--cd,#fff);color:var(--fg);border:2px solid #f5b301;box-shadow:0 4px 16px #0004;cursor:pointer;animation:rptn .35s cubic-bezier(.2,1.5,.4,1)}
 .rp-toast .e{font-size:28px;line-height:1;flex:0 0 auto}.rp-toast .x{min-width:0}.rp-toast small{display:block;font-size:11px;font-weight:800;color:#7c5cff}.rp-toast b{display:block;font-size:14px;line-height:1.3}.rp-toast em{display:block;font-style:normal;font-size:11px;color:var(--mu)}
 .rp-toast.out{opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s}
 @keyframes rptn{from{opacity:0;transform:translateY(14px) scale(.8)}to{opacity:1;transform:none}}`;
@@ -261,7 +261,7 @@ function openBox(items,sum){document.querySelectorAll(".rp-box").forEach(x=>x.re
  d.innerHTML="<div>"+h+"</div>";let tm=0;const close=()=>{clearTimeout(tm);d.remove()};d.onclick=close;
  const go=d.querySelector("button.go");if(go)go.onclick=e=>{e.stopPropagation();close();seeAll()};
  document.body.appendChild(d);tm=setTimeout(close,sum?(homeEl?6000:4000):3800);confetti(sum||items.length>1?18:14,103)}
-// 單元頁：mini-HUD 上方的小吐司，不擋回音法按鈕，約 2.5 秒自動消失
+// 單元頁：mini-HUD 下方的小吐司（視窗在右上角），不擋回音法按鈕，約 2.5 秒自動消失
 function toast(items){document.querySelectorAll(".rp-toast").forEach(x=>x.remove());if(!items.length)return;const xp=st().xp,t=items[items.length-1],n=items.length,d=document.createElement("div");d.className="rp-toast";d.setAttribute("role","status");
  d.innerHTML=`<span class="e">${t.ico}</span><span class="x"><small>🎁 開箱！${n>1?"一次 "+n+" 件":catName(t.cat)}</small><b>${n>1?t.name+" 等 "+n+" 件":t.name}</b><em>身價 ${money(n>1?items.reduce((a,i)=>a+trValue(i,xp),0):trValue(t,xp))}</em></span>`;
  d.onclick=()=>d.remove();document.body.appendChild(d);setTimeout(()=>d.classList.add("out"),2300);setTimeout(()=>d.remove(),2600);confetti(6)}
