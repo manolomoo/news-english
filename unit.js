@@ -9,6 +9,9 @@ const fmt=s=>esc(s).replace(/\{(\d+)\|([^}]+)\}/g,'<mark class="kw"><sup>$1</sup
 const key=c=>c.say||c.w;
 const list=()=>G[g].cards;
 const ALL=G.flatMap(x=>x.cards);
+/* 起始卡：該組 pget 最小者（同分取講義順序最前），不重排卡片 */
+function startIdx(){const L=list();let b=0,m=Infinity;for(let k=0;k<L.length;k++){const n=RW.pget(W.uid+"|cards|"+key(L[k]))||0;if(n<m){m=n;b=k}}return b}
+function pickStart(){if(playing)return;i=startIdx();render()}
 function play1(k){return TTS.play(k,rate)}
 const wait=s=>{const t=TTS.sess();return new Promise(r=>setTimeout(()=>r(TTS.sess()===t),s*1000))};
 async function seq(keys){let t=0;for(const k of keys){const d=await play1(k);if(d==null)return t;t+=d}return t}
@@ -35,7 +38,7 @@ async function play(){TTS.cancel();const r=++run,s0=TTS.sess();playing=true;rend
   for(let j=0;j<parts.length;j++){const rounds=j===0?2:1;for(let k=0;k<rounds;k++){setCue("listen",(j?"例句":"單字")+"｜");$("w").classList.add("hl");const d=await play1(parts[j]);$("w").classList.remove("hl");if(d==null||!ok())return;
    setCue("echo");if(!await wait(echoGap(d))||!ok())return;setCue("shadow");if(!await wait(shadowGap(d))||!ok())return}}
   if(!await wait(.5)||!ok())return;if(i+1<L.length)i++;else break}
- if(ok()){playing=false;i=0;setCue("");render()}}
+ if(ok()){playing=false;i=startIdx();setCue("");render()}}
 /* ===== 課文 ===== */
 const SENT=[];let sj=0;
 const zhOf=(t,pi,si)=>{const z=t.zh&&t.zh[pi]&&t.zh[pi][si];return z?`<div class="zhs">${esc(z)}</div>`:""};
@@ -86,9 +89,9 @@ $("o1").onclick=()=>once([key(list()[i])]);$("o2").onclick=()=>{const e=list()[i
 $("pv").onclick=()=>{stop();i=(i-1+list().length)%list().length;render()};$("nx").onclick=()=>{stop();i=(i+1)%list().length;render()};$("pl").onclick=()=>playing?stop():play();
 $("texts").innerHTML=textsHTML();bindTexts();
 $("syn").innerHTML=synHTML();$("syn").querySelectorAll("tr").forEach(tr=>tr.onclick=()=>once([W.syn[+tr.dataset.k][0]]));
-seg($("grp"),G.map(x=>x.name),g,k=>{stop();g=k;i=0;render()});
+seg($("grp"),G.map(x=>x.name),g,k=>{stop();g=k;i=startIdx();render()});
 seg($("rate"),R.map(r=>r+"x"),R.indexOf(rate),k=>{rate=R[k]});
 seg($("dkseg"),DK.map(x=>x.name),dk,k=>{stop();dk=k;di=0;drill()});
 if(!TTS.supported())$("nov").style.display="";
-try{qi=Math.floor(Math.random()*Q.length);setCue("");render();quiz();drill();window.__unitReady=1}catch(e){console.error(e);document.body.insertAdjacentHTML("afterbegin","<div style='padding:12px;color:#d64545'>載入失敗："+e+"</div>")}
+try{qi=Math.floor(Math.random()*Q.length);setCue("");i=startIdx();render();quiz();drill();window.__unitReady=1}catch(e){console.error(e);document.body.insertAdjacentHTML("afterbegin","<div style='padding:12px;color:#d64545'>載入失敗："+e+"</div>")}
 RW.page(W.uid,{qans:()=>Q[qi].a,list:()=>list(),idx:()=>i,cardKey:c=>key(c),qkey:()=>Q[qi].k,drillFn:"drill",cards:ALL.map(key),exCard:Object.fromEntries(ALL.flatMap(c=>[c.ex,c.ex2].filter(Boolean).map(e=>[e,key(c)]))),story:SENT,score:()=>score,done:()=>done,speakBtn:$("dr"),speakText:()=>$("da").textContent});RPG.page();
