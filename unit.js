@@ -23,7 +23,7 @@ function clearHl(){document.querySelectorAll(".sn.hl").forEach(e=>e.classList.re
    d 是實際音檔秒數，短的停短、長的停長；另設下限避免單字太倉促。 */
 const echoGap=d=>Math.max(1,d+.3),shadowGap=d=>Math.max(1.5,d*1.25+.6);
 function stop(){TTS.cancel();run++;playing=false;setCue("");clearHl();render()}
-async function once(keys){stop();await seq(keys)}
+async function once(keys){if(window.TTS&&TTS.unlock)TTS.unlock();stop();await seq(keys)}
 /* ===== 單字圖卡 ===== */
 function grid(){$("ga").innerHTML=list().map((c,k)=>`<div class="ca${k===i?" cur":""}" data-k="${k}"><span class="sp">🔊</span>${(window.ICONS&&window.ICONS[c.w])?`<div class="ci">${window.ICONS[c.w]}</div>`:""}<div class="en">${esc(c.w)}</div><div class="zh">${esc(c.zq||c.zh||"")}</div><div class="tg">${esc(c.pos.split(/[,，（(\[]/)[0].trim())}</div></div>`).join("");
  $("ga").querySelectorAll(".ca").forEach(el=>el.onclick=()=>{stop();i=+el.dataset.k;render();once([key(list()[i])])})}
@@ -33,7 +33,7 @@ function render(){const L=list();if(i>=L.length)i=0;const c=L[i];$("pl").textCon
  $("def").textContent="";$("zh").textContent=c.zh||"";
  $("ex").innerHTML=c.ex?`<div>${esc(c.ex)}</div><div class="mu">${esc(c.exzh||"")}</div>`+(c.ex2?`<div style="margin-top:6px">${esc(c.ex2)}</div><div class="mu">${esc(c.ex2zh||"")}</div>`:""):"";
  grid()}
-async function play(){TTS.cancel();const r=++run,s0=TTS.sess();playing=true;render();const ok=()=>run===r&&TTS.sess()===s0;const L=list();
+async function play(){if(window.TTS&&TTS.unlock)TTS.unlock();TTS.cancel();const r=++run,s0=TTS.sess();playing=true;render();const ok=()=>run===r&&TTS.sess()===s0;const L=list();
  while(ok()&&i<L.length){render();const c=L[i],parts=cardKeys(c);
   for(let j=0;j<parts.length;j++){const rounds=j===0?2:1;for(let k=0;k<rounds;k++){setCue("listen",(j?"例句":"單字")+"｜");$("w").classList.add("hl");const d=await play1(parts[j]);$("w").classList.remove("hl");if(d==null||!ok())return;
    setCue("echo");if(!await wait(echoGap(d))||!ok())return;setCue("shadow");if(!await wait(shadowGap(d))||!ok())return}}
@@ -87,6 +87,7 @@ $("dn").onclick=()=>{stop();const n=DK[dk].items.length;di=n>1?(di+1+Math.floor(
 $("dq").onclick=()=>{if(DK[dk].kind==="qa")once([DK[dk].items[di].q.replace(/^(Q\d|Question):\s*/,"")])};
 $("o1").onclick=()=>once([key(list()[i])]);$("o2").onclick=()=>{const e=list()[i].ex;if(e)once([e])};
 $("pv").onclick=()=>{stop();i=(i-1+list().length)%list().length;render()};$("nx").onclick=()=>{stop();i=(i+1)%list().length;render()};$("pl").onclick=()=>playing?stop():play();
+(function(){["pl","o1","o2"].forEach(function(id){var el=$(id);if(el&&TTS.unlock)el.addEventListener("pointerdown",function(){TTS.unlock()},{passive:true});});})();
 $("texts").innerHTML=textsHTML();bindTexts();
 $("syn").innerHTML=synHTML();$("syn").querySelectorAll("tr").forEach(tr=>tr.onclick=()=>once([W.syn[+tr.dataset.k][0]]));
 const GN={"咖啡篇單字":"咖啡篇","快報焦點":"焦點快報","洞察篇單字":"洞察篇"};
