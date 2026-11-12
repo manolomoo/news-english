@@ -25,7 +25,7 @@ async function once(keys){stop();await seq(keys)}
 function grid(){$("ga").innerHTML=list().map((c,k)=>`<div class="ca${k===i?" cur":""}" data-k="${k}"><span class="sp">🔊</span><div class="en">${esc(c.w)}</div><div class="zh">${esc(c.zq||c.zh||"")}</div><div class="tg">${esc(c.pos.split(/[,，（(\[]/)[0].trim())}</div></div>`).join("");
  $("ga").querySelectorAll(".ca").forEach(el=>el.onclick=()=>{stop();i=+el.dataset.k;render();once([key(list()[i])])})}
 function cardKeys(c){return c.ex?[key(c),c.ex]:[key(c)]}
-function render(){const L=list();if(i>=L.length)i=0;const c=L[i];$("pos").textContent=G[g].name+"　"+(i+1)+" / "+L.length;
+function render(){const L=list();if(i>=L.length)i=0;const c=L[i];$("pl").textContent=playing?"⏸ 暫停":"▶ 回音法播放";$("pos").textContent=G[g].name+"　"+(i+1)+" / "+L.length;
  $("w").textContent=c.w;$("tag").innerHTML=esc(c.pos.split(/[,，（(\[]/)[0].trim());$("ipa").textContent="";
  $("def").textContent="";$("zh").textContent=c.zh||"";
  $("ex").innerHTML=c.ex?`<div>${esc(c.ex)}</div><div class="mu">${esc(c.exzh||"")}</div>`+(c.ex2?`<div style="margin-top:6px">${esc(c.ex2)}</div><div class="mu">${esc(c.ex2zh||"")}</div>`:""):"";
