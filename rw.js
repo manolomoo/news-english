@@ -1,4 +1,4 @@
-/* 練習紀錄與💩 */
+/* 練習紀錄與💵 */
 (function(){
 /* 每週加一個單元：複製下面一行、改 id / n / file / dates / title 即可（id 一旦上線不要改，練習紀錄靠它） */
 const UNITS=[
@@ -8,9 +8,9 @@ const RULE={cards:"每張單字卡都聽過一次（點卡、念一次或回音�
 const KEY="enNewsRW1";let MEM=null,LSOK=true;try{localStorage.setItem("__t","1");localStorage.removeItem("__t")}catch(e){LSOK=false}
 const ld=()=>{if(!LSOK)return MEM||(MEM={});try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return MEM||{}}};
 const sv=d=>{MEM=d;if(LSOK)try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){LSOK=false}};
-const POO=n=>n?"💩".repeat(Math.min(n,4)):"";const pget=k=>((ld().pm||{})[k])||0;
+const POO=n=>n?"💵".repeat(Math.min(n,4)):"";const pget=k=>((ld().pm||{})[k])||0;
 const last={};function emit(o){try{window.dispatchEvent(new CustomEvent("rwx",{detail:o}))}catch(e){}}
-function pinc(k,force){const t=Date.now();if(!force&&last[k]&&t-last[k]<2500)return 0;last[k]=t;const d=ld();d.pm=d.pm||{};const was=d.pm[k]||0;d.pm[k]=Math.min(was+1,4);sv(d);toast("+💩");return was?2:1}
+function pinc(k,force){const t=Date.now();if(!force&&last[k]&&t-last[k]<2500)return 0;last[k]=t;const d=ld();d.pm=d.pm||{};const was=d.pm[k]||0;d.pm[k]=Math.min(was+1,4);sv(d);toast("+💵");return was?2:1}
 function toast(m){let e=document.getElementById("rw-t");if(!e){e=document.createElement("div");e.id="rw-t";document.body.appendChild(e)}e.textContent=m;e.className="";void e.offsetWidth;e.className="on"}
 function verCheck(){const pv=window.PAGEVER;if(!pv)return;fetch("version.txt?"+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.text():"").then(v=>{v=(v||"").trim();if(v&&v!==pv){const b=document.createElement("div");b.className="rw-ban";b.innerHTML="有新版本 ✨ <button>點我更新</button>";b.querySelector("button").onclick=()=>location.replace(location.pathname+"?v="+v);document.body.prepend(b)}}).catch(()=>{})}
 function tst(u,t){const x=((ld()[u]||{})[t])||{};return x.c?2:x.s?1:0}
@@ -26,7 +26,7 @@ const U=UNITS.find(x=>x.id===uid);const box=document.getElementById("rw");
 const sess={quiz:[0,0],hw:null};cfg.allCards=cfg.cards;RW.cfg=cfg;RW.uid=uid;
 function upd(t,fn){const d=ld();d[uid]=d[uid]||{};const x=d[uid][t]=d[uid][t]||{};const before=ust(U),bt=x.c?2:x.s?1:0;fn(x);x.s=1;sv(d);const at=x.c?2:1,after=ust(U);if(at===2&&bt!==2)emit({uid,t:"crown",ty:t});if(after===2&&before!==2)emit({uid,t:"king"});
 draw()}
-var draw=function(){box.innerHTML=`${LSOK?"":'<div style="color:#d64545;font-size:13px">⚠️ 這個瀏覽器無法儲存進度（可能是私密瀏覽），離開頁面後練習紀錄和💩會消失。</div>'}<div class="rwr">💩＝每個單字／題目／句子練過幾次（最多 4 個）。版本 ${window.PAGEVER||""}</div><details class="rwr"><summary>完成規則</summary>${U.types.map(t=>"・"+TN[t]+"："+RULE[t]).join("<br>")}<br><a href="#" id="rwreset" style="color:var(--mu)">重設本單元進度</a></details>`;
+var draw=function(){box.innerHTML=`${LSOK?"":'<div style="color:#d64545;font-size:13px">⚠️ 這個瀏覽器無法儲存進度（可能是私密瀏覽），離開頁面後練習紀錄和💵會消失。</div>'}<div class="rwr">💵＝每個單字／題目／句子練過幾次（最多 4 張）。版本 ${window.PAGEVER||""}</div><details class="rwr"><summary>完成規則</summary>${U.types.map(t=>"・"+TN[t]+"："+RULE[t]).join("<br>")}<br><a href="#" id="rwreset" style="color:var(--mu)">重設本單元進度</a></details>`;
 const r=document.getElementById("rwreset");if(r)r.onclick=e=>{e.preventDefault();if(confirm("確定重設本單元的練習進度？")){const d=ld();delete d[uid];sv(d);draw()}}}
 const heard=(t,list,k)=>{if(!list.includes(k))return;upd(t,x=>{x.h=x.h||[];if(!x.h.includes(k))x.h.push(k);if(x.h.length>=list.length)x.c=1})};
 const _p=window.play1;window.play1=function(k){cfg.onPlay&&cfg.onPlay(k);heard("cards",cfg.cards,k);if(cfg.story)heard("story",cfg.story,k);return _p.apply(this,arguments)};

@@ -1,4 +1,4 @@
-/* 新聞英文・貴婦系統（全站共用）— 需先載入 rw.js。練習紀錄與💩仍由 rw.js 負責。 */
+/* 新聞英文・貴婦系統（全站共用）— 需先載入 rw.js。練習紀錄與💵仍由 rw.js 負責。 */
 (function(){
 const K="enLadyRPG1";let MEM=null;
 const ld=()=>{try{const v=localStorage.getItem(K);if(v)return JSON.parse(v)}catch(e){}return MEM||{}};
@@ -137,6 +137,12 @@ const css=document.createElement("style");css.textContent=`
 .rp-as-v small{font-size:13px;font-weight:700;color:var(--mu);margin-right:6px}
 .rp-as-n{font-size:13px;color:var(--mu);margin-top:6px;overflow-wrap:anywhere}.rp-as-q{font-size:13px;margin-top:8px;padding:8px 10px;border-radius:12px;border:1px dashed var(--ln);color:var(--fg)}
 .rp-card.rp-as{padding:0;overflow:hidden}
+#rpg #assets{margin-top:12px;padding-top:10px;border-top:1px solid var(--ln)}
+#rpg #assets .rp-as-t{padding:6px 2px;min-height:40px;border-radius:10px}
+#rpg #assets .rp-as-h b{font-size:15px}
+#rpg #assets .rp-as-v{font-size:20px}
+#rpg #assets .rp-as-p{padding:0 0 4px}
+
 .rp-as-t{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;margin:0;padding:12px 16px;border:0;border-radius:17px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .rp-as-t:active{background:#7c5cff1f}.rp-as-t:focus{outline:none}.rp-as-t:focus-visible{outline:3px solid #7c5cff;outline-offset:-3px}
 @media(hover:hover){.rp-as-t:hover{background:#7c5cff12}}
@@ -238,13 +244,13 @@ function drawAssets(){const a=document.getElementById("assets");if(!a)return;con
  const t=a.querySelector(".rp-as-t");if(t)t.onclick=()=>{const o=!asOpen();asSet(o);asApply(a,o)}}
 function home(el){migrate();homeEl=el;const draw=()=>{const s=st(),v=lvOf(s.xp),t=title(v.L);const[mx,left]=hints();const mxA=Math.max(1,...Object.keys(ATTR).map(a=>s.at[a]||0));
  el.innerHTML=`<div class="rp-card" id="rpg"><div class="rp-row">${avatar(v.L,64)}<div style="flex:1"><div style="font-size:13px;color:var(--mu)">💎 貴婦系統</div><div style="font-size:22px;font-weight:900">Lv ${v.L}　${t[0]}</div><div style="font-weight:700">${t[1]}</div></div></div>
+ <div id="assets"></div>
  <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:10px;color:var(--mu)"><span>經驗值 ${v.cur} / ${v.nx}</span><span>總 XP ${s.xp}</span></div><div class="rp-bar"><i style="width:${Math.round(v.cur/v.nx*100)}%"></i></div>
  <div class="rp-at">${Object.entries(ATTR).map(([a,n])=>`<span>${n}</span><div class="rp-bar"><i style="width:${Math.round((s.at[a]||0)/mxA*100)}%;background:linear-gradient(90deg,#1a9a5a,#7ad38f)"></i></div><span style="font-size:12px">Lv${attrLv(s.at[a])} +${attrBonus(s.at[a])}%</span>`).join("")}</div>
  <div style="font-size:13px;margin-top:10px">今日：練習 ${s.day.n} 次${has(v.L,"daily")?"（早午餐加倍剩 "+Math.max(0,10-s.day.n)+" 次）":""}・提示 ${left}/${mx}・目前連續答對 ${s.combo}（最佳 ${s.best}）</div>
- <div class="rp-ab">${ABIL.map(a=>`<span class="${v.L>=a.lv?"on":"off"}" title="${a.desc}">${v.L>=a.lv?"✔":"🔒 Lv"+a.lv} ${a.name}</span>`).join("")}</div>
  <details class="rwr" style="margin-top:8px"><summary>升級規則</summary>
  XP：聽新卡 10（重聽 3）・答對 15（同題再答 8）・答錯 3・口說 12（重複 5）・課文新句 8（重聽 3）・題型全部完成 +50・單元全部完成 +150。<br>
  屬性：課文跟讀→聽力、口說→口說、單字卡和測驗→詞彙。屬性每升 1 級，該類 XP +2%（上限 30%）。<br>
- 能力：${ABIL.map(a=>"Lv"+a.lv+" "+a.name+"："+a.desc).join("；")}。<br>${s.migXP?"已把之前的💩和練習紀錄換算成 "+s.migXP+" XP。":""}<br>寶藏會依累計 XP 自動開箱，經驗值不會被花掉。</details></div><div class="rp-card" id="assets"></div>`;drawAssets()};draw();RPG.onChange=draw;trCheck()}
+ 能力：${ABIL.map(a=>"Lv"+a.lv+" "+a.name+"："+a.desc).join("；")}。<br>${s.migXP?"已把之前的💵和練習紀錄換算成 "+s.migXP+" XP。":""}<br>寶藏會依累計 XP 自動開箱，經驗值不會被花掉。</details></div>`;drawAssets()};draw();RPG.onChange=draw;trCheck()}
 window.RPG={page,home,st,lvOf,need,gain,hints,TITLES,ABIL,TREASURES,CATS,trValue,money,worth};
 })();

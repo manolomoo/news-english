@@ -6,7 +6,7 @@
 - `week01-data.js`：本週全部講義資料（單字卡、課文、近義辨析、Say it、Q&A）
 - `unit.js`：單元頁引擎（圖卡、回音法、課文跟讀、測驗、口說）。以後每週共用
 - `speech.js`：播放預錄 mp3（`new Audio()`，變速用 `playbackRate`＋`preservesPitch`），API 不變（`TTS.play/cancel/sess`）；找不到音檔才退回 `speechSynthesis` 並在 console 警告
-- `rw.js`：練習紀錄、💩、首頁單元列表（`UNITS` 陣列，加新週只要加一行）
+- `rw.js`：練習紀錄、💵、首頁單元列表（`UNITS` 陣列，加新週只要加一行）
 - `rpg.js`：貴婦系統。已改 localStorage key：`enNewsRW1`、`enLadyRPG1`、`enLadyAssetsOpen`；頭銜、貴婦小語、屬性（聽力／口說／詞彙）改成英文站版本
 - `style.css`、`version.txt`（=1，`PAGEVER`=1）
 
@@ -23,7 +23,7 @@
 
 ## 測試（headless Chrome，用假的 speechSynthesis 加速）
 - 首頁、單元頁無 JS 錯誤（0 個 exception／console error）
-- 單字 46 張、課文 38 句載入正常；點卡後 +10 XP 並出現 💩
+- 單字 46 張、課文 38 句載入正常；點卡後 +10 XP 並出現 💵
 - 全文連播會累計課文已聽句數；小測驗連續答對 10 題後記錄 100% 並標記完成
 - Say it「看答案＋聽」顯示參考答案並記入口說進度；回音法播放與停止正常；貴婦 XP／寶藏會增加
 - 沒有在真實手機上試聽
