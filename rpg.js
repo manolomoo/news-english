@@ -42,7 +42,7 @@ const BASE={cards:[10,3],story:[8,3],speak:[12,5],hang:[25,15],quizOk:[15,8],qui
 const today=()=>new Date().toLocaleDateString("sv");
 const attrLv=p=>Math.floor(Math.sqrt((p||0)/10));          // 屬性等級
 const attrBonus=p=>Math.min(attrLv(p)*2,30);                 // 每屬性等級 +2% 該類 XP，上限 30%
-function st(){const d=ld();d.xp=d.xp||0;d.at=d.at||{};d.day=d.day||{};if(d.day.d!==today())d.day={d:today(),n:0,h:0};d.combo=d.combo||0;d.best=d.best||0;return d}
+function st(){const d=ld();d.xp=d.xp||0;d.at=d.at||{};d.day=d.day||{};if(d.day.d!==today())d.day={d:today(),n:0,h:0};d.combo=d.combo||0;d.best=d.best||0;d.pets=Array.isArray(d.pets)?d.pets.filter(x=>typeof x==="string"):[];d.petSpent=typeof d.petSpent==="number"&&d.petSpent>0?d.petSpent:0;return d}
 function migrate(){const d=ld();if(d.mig)return;const r=window.RW?RW.ld():{};let xp=0;const at={lis:0,spk:0,voc:0};
  Object.entries(r.pm||{}).forEach(([k,n])=>{const[u,t]=k.split("|");const b=t==="quiz"?BASE.quizOk:BASE[t]||[5,2];const g=b[0]+(n-1)*b[1];xp+=g;const a=attrOf(t,u);if(a)at[a]+=g});
  (RW?RW.UNITS:[]).forEach(U=>{U.types.forEach(t=>{if(RW.tst(U.id,t)===2)xp+=BASE.crown[0]});if(RW.ust(U)===2)xp+=BASE.king[0]});
@@ -122,6 +122,41 @@ const num=n=>Math.round(n).toLocaleString("en-US");
 function money(n){const w=Math.round(n/W);if(w<1)return num(n)+" 元";const y=Math.floor(w/1e4),r=w%1e4;return y?num(y)+" 億"+(r?" "+num(r)+" 萬":""):num(w)+" 萬"}
 const owned=xp=>TREASURES.filter(t=>xp>=t.xp);
 const worth=xp=>owned(xp).reduce((a,t)=>a+trValue(t,xp),0);
+// 寵物店：用總身價購買，只累計 petSpent，不動 XP／寶藏
+const PETS=[
+ {id:"goldfish",ico:"🐠",name:"金魚「珍珠」",price:3*W,lv:1},
+ {id:"hamster",ico:"🐹",name:"倉鼠「奶茶」",price:8*W,lv:2},
+ {id:"parrot",ico:"🦜",name:"鸚鵡「小金」",price:15*W,lv:3},
+ {id:"ragdoll",ico:"🐱",name:"布偶貓「棉花」",price:25*W,lv:4},
+ {id:"persian",ico:"😺",name:"波斯貓「伯爵」",price:40*W,lv:5},
+ {id:"poodle",ico:"🐩",name:"貴賓狗「奶霜」",price:80*W,lv:6},
+ {id:"corgi",ico:"🐕",name:"柯基「奶油」",price:120*W,lv:7},
+ {id:"alpaca",ico:"🦙",name:"羊駝「雲朵」",price:200*W,lv:8},
+ {id:"peacock",ico:"🦚",name:"孔雀「霓裳」",price:500*W,lv:10},
+ {id:"minipony",ico:"🐴",name:"迷你馬「香檳」",price:2000*W,lv:12},
+ {id:"panda",ico:"🐼",name:"熊貓「團子」",price:1*Y,lv:16},
+ {id:"whitetiger",ico:"🐅",name:"白老虎「月光」",price:5*Y,lv:20}];
+const netWorth=xp=>Math.max(0,worth(xp)-(st().petSpent||0));
+let petOpen=false,myOpen=false;
+function buyPet(id){const s=st(),p=PETS.find(x=>x.id===id);if(!p||s.pets.includes(id))return false;const xp=s.xp;
+ if(lvOf(xp).L<p.lv||netWorth(xp)<p.price)return false;
+ s.petSpent=Math.min(s.petSpent+p.price,worth(xp));s.pets=s.pets.concat(id);sv(s);return true}
+function petConfirm(id,done){const p=PETS.find(x=>x.id===id);if(!p)return;document.querySelectorAll(".rp-box").forEach(x=>x.remove());
+ const d=document.createElement("div");d.className="rp-box";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");
+ d.innerHTML=`<div><div class="k">🐾 寵物店</div><div class="e">${p.ico}</div><div class="n">${p.name}</div><div class="c">確定要用 ${money(p.price)} 買下嗎？<br>買了會從總身價扣除。</div><div class="bt"><button type="button" class="go">確定購買</button><button type="button" class="no">先不要</button></div></div>`;
+ const close=()=>d.remove();d.onclick=e=>{if(e.target===d)close()};d.querySelector(".no").onclick=close;
+ d.querySelector(".go").onclick=()=>{close();if(buyPet(id))done(p)};document.body.appendChild(d)}
+function petToast(p){document.querySelectorAll(".rp-toast").forEach(x=>x.remove());const d=document.createElement("div");d.className="rp-toast";d.setAttribute("role","status");
+ d.innerHTML=`<span class="e">${p.ico}</span><span class="x"><small>🐾 新寵物</small><b>${p.name}</b></span>`;document.body.appendChild(d);setTimeout(()=>d.classList.add("out"),2200);setTimeout(()=>d.remove(),2600)}
+function petsHTML(s){const xp=s.xp,L=lvOf(xp).L,nw=netWorth(xp),mine=PETS.filter(p=>s.pets.includes(p.id));
+ const tiles=PETS.map(p=>{const have=s.pets.includes(p.id);let a;
+  if(have)a='<div class="g">✅ 已擁有</div>';
+  else if(L<p.lv)a=`<button type="button" disabled>購買</button><div class="r">等級不足（需 Lv ${p.lv}）</div>`;
+  else if(nw<p.price)a=`<button type="button" disabled>購買</button><div class="r">身價不足（還差 ${money(p.price-nw)}）</div>`;
+  else a=`<button type="button" class="go" data-buy="${p.id}">購買</button>`;
+  return `<div class="rp-ti rp-pt${have?" on":""}"><div class="e">${p.ico}</div><div class="n">${p.name}</div><div class="v">${money(p.price)}</div><div class="c">Lv ${p.lv}</div>${a}</div>`}).join("");
+ return `<details class="rp-pet" data-k="shop"${petOpen?" open":""}><summary>🐾 寵物店<span>淨身價 ${money(nw)}</span></summary><div class="rp-pg">${tiles}</div></details>
+ <details class="rp-pet" data-k="mine"${myOpen?" open":""}><summary>🐶 我的寵物<span>${mine.length}/${PETS.length}</span></summary>${mine.length?'<div class="rp-pm">'+mine.map(p=>`<span>${p.ico} ${p.name}</span>`).join("")+"</div>":'<div class="rp-pn">還沒有寵物，去寵物店看看吧</div>'}</details>`}
 const SAYINGS=["優雅不是天生的，是每天練出來的。","今天多念一句，包包就離妳近一點。","真正的貴婦，連新聞標題都念得從容。","錢包可以空，英文不能空。","下午茶之前，先來一輪回音法。","學英文和買包一樣：越早開始越划算。","台積電會漲，妳的英文也會。","A lady never stops learning. 貴婦永遠在學習。","今天的口說，是明天和外國朋友聊天的底氣。","Step by step 一步一步來，豪宅也是一塊磚一塊磚蓋的。","狗狗在等妳下課，再念一遍就好。","氣質是存出來的，經驗值也是。"];
 function saying(){const d=new Date(),n=Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);return SAYINGS[n%SAYINGS.length]}
 let AVN=0;
@@ -229,6 +264,11 @@ const css=document.createElement("style");css.textContent=`
 .rp-ti.off{border-style:dashed}.rp-ti.off .e{filter:grayscale(1) contrast(0);opacity:.45}.rp-ti.off .n,.rp-ti.off .v{color:var(--mu);font-weight:600}
 .rp-ti.nx{border-color:#7c5cff;border-style:solid}.rp-ti.nx .v{color:#7c5cff;font-weight:800}
 @media(prefers-color-scheme:dark){.rp-ti .v{color:#f5c542}}
+.rp-avw{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;max-width:92px}.rp-pe{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1px;font-size:22px;line-height:1.25}
+.rp-as-d{font-style:normal;font-size:11px;font-weight:700;color:var(--mu);margin-left:6px;-webkit-text-fill-color:currentColor}
+.rp-pet{margin-top:8px;border:1px solid var(--ln);border-radius:14px;padding:0 10px}.rp-pet summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:800;font-size:15px;cursor:pointer}.rp-pet summary span{font-size:12px;font-weight:600;color:var(--mu)}
+.rp-pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;padding:2px 0 10px}.rp-pt .e{font-size:28px}.rp-pt button{margin-top:6px;min-height:36px;width:100%;border-radius:99px;border:1px solid var(--ln);background:transparent;color:var(--fg);font:inherit;font-size:13px;font-weight:700;cursor:pointer}.rp-pt button.go{background:#7c5cff;border-color:#7c5cff;color:#fff}.rp-pt button:disabled{opacity:.45;cursor:not-allowed}.rp-pt .r{font-size:11px;color:var(--mu);margin-top:3px;line-height:1.35}.rp-pt .g{margin-top:8px}
+.rp-pm{display:flex;flex-wrap:wrap;gap:6px 12px;padding:0 0 10px;font-size:14px}.rp-pn{font-size:13px;color:var(--mu);padding:0 0 10px}
 .rp-box{position:fixed;inset:0;z-index:102;display:flex;align-items:center;justify-content:center;background:#0009;padding:16px;animation:rpbf .25s ease}
 .rp-box>div{background:var(--cd,#fff);color:var(--fg);border-radius:22px;padding:20px 22px 16px;text-align:center;border:3px solid #f5b301;box-shadow:0 0 0 4px #7c5cff55,0 12px 40px #0006;width:min(340px,100%);max-height:90vh;overflow:auto;animation:rpz .5s cubic-bezier(.2,1.6,.4,1)}
 .rp-box .k{font-weight:900;font-size:22px;background:linear-gradient(90deg,#7c5cff,#f5b301);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -297,7 +337,7 @@ function assetsHTML(s,op){const xp=s.xp,got=owned(xp),nx=TREASURES.find(t=>xp<t.
  const tiles=list.map(t=>xp>=t.xp?`<div class="rp-ti on"><div class="e">${t.ico}</div><div class="n">${t.name}</div><div class="v">${money(trValue(t,xp))}</div>${t.grow&&growPct(xp)?'<div class="g">📈 增值 +'+growPct(xp)+"%</div>":""}</div>`
   :`<div class="rp-ti off${t===nx?" nx":""}"><div class="e">${t.ico}</div><div class="n">？？？</div><div class="v">${t===nx?"還差 "+num(t.xp-xp)+" XP":"需 "+num(t.xp)+" XP"}</div><div class="c">${catName(t.cat)}</div></div>`).join("");
  return `<button type="button" class="rp-as-t" aria-expanded="${op?"true":"false"}" aria-controls="rp-as-b"><span class="rp-as-x"><span class="rp-as-h"><b>👑 我的貴婦資產</b><span>已收藏 ${got.length}/${TREASURES.length}</span></span>
- <span class="rp-as-l"><span class="rp-as-v"><small>總身價</small>${got.length?money(worth(xp)):"0 元"}</span><span class="rp-as-s">${nx?"下一件還差 "+num(nx.xp-xp)+" XP":"全部收藏齊了 🎉"}</span></span></span><i class="rp-as-c" aria-hidden="true"></i></button>
+ <span class="rp-as-l"><span class="rp-as-v"><small>總身價</small>${got.length?money(netWorth(xp)):"0 元"}${(s.petSpent||0)>0?'<em class="rp-as-d">已扣除寵物</em>':""}</span><span class="rp-as-s">${nx?"下一件還差 "+num(nx.xp-xp)+" XP":"全部收藏齊了 🎉"}</span></span></span><i class="rp-as-c" aria-hidden="true"></i></button>
  <div class="rp-as-b" id="rp-as-b"><div class="rp-as-bi"><div class="rp-as-p"><div class="rp-bar"><i style="width:${Math.round(got.length/TREASURES.length*100)}%;background:linear-gradient(90deg,#7c5cff,#f5b301)"></i></div>
  <div class="rp-as-n">${nx?"下一件寶藏："+catName(nx.cat)+"・還差 "+num(nx.xp-xp)+" XP 自動開箱":"全部寶藏都收藏齊了，頂級貴婦就是妳！"}</div>
  <div class="rp-as-q">💬 今日貴婦小語：${saying()}</div>
@@ -306,14 +346,16 @@ function drawAssets(){const a=document.getElementById("assets");if(!a)return;con
  const n=a.querySelector(".rp-tabs");if(n){n.scrollLeft=sl;n.onclick=e=>{const b=e.target.closest?e.target.closest("button[data-c]"):null;if(!b)return;trTab=b.getAttribute("data-c");drawAssets()}}
  const t=a.querySelector(".rp-as-t");if(t)t.onclick=()=>{const o=!asOpen();asSet(o);asApply(a,o)}}
 function home(el){migrate();homeEl=el;const draw=()=>{const s=st(),v=lvOf(s.xp),t=title(v.L);const[mx,left]=hints();const mxA=Math.max(1,...Object.keys(ATTR).map(a=>s.at[a]||0));
- el.innerHTML=`<div class="rp-card" id="rpg"><div class="rp-row">${avatar(v.L,64)}<div style="flex:1"><div style="font-size:13px;color:var(--mu)">💎 貴婦系統</div><div style="font-size:22px;font-weight:900">Lv ${v.L}　${t[0]}</div><div style="font-weight:700">${t[1]}</div></div></div>
+ el.innerHTML=`<div class="rp-card" id="rpg"><div class="rp-row"><div class="rp-avw">${avatar(v.L,64)}${s.pets.length?`<div class="rp-pe" aria-label="我的寵物">${PETS.filter(p=>s.pets.includes(p.id)).map(p=>`<span title="${p.name}">${p.ico}</span>`).join("")}</div>`:""}</div><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--mu)">💎 貴婦系統</div><div style="font-size:22px;font-weight:900">Lv ${v.L}　${t[0]}</div><div style="font-weight:700">${t[1]}</div></div></div>
  <div id="assets"></div>
+ <div id="petshop">${petsHTML(s)}</div>
  <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:10px;color:var(--mu)"><span>${v.max?"經驗值 👑 滿級 Lv "+MAXLV:"經驗值 "+v.cur+" / "+v.nx}</span><span>總 XP ${s.xp}</span></div><div class="rp-bar"><i style="width:${Math.round(v.cur/v.nx*100)}%"></i></div>
  <div class="rp-at">${Object.entries(ATTR).map(([a,n])=>`<span>${n}</span><div class="rp-bar"><i style="width:${Math.round((s.at[a]||0)/mxA*100)}%;background:linear-gradient(90deg,#1a9a5a,#7ad38f)"></i></div><span style="font-size:12px">Lv${attrLv(s.at[a])} +${attrBonus(s.at[a])}%</span>`).join("")}</div>
  <div style="font-size:13px;margin-top:10px">今日：練習 ${s.day.n} 次${has(v.L,"daily")?"（早午餐加倍剩 "+Math.max(0,10-s.day.n)+" 次）":""}・提示 ${left}/${mx}・目前連續答對 ${s.combo}（最佳 ${s.best}）</div>
  <details class="rwr" style="margin-top:8px"><summary>升級規則</summary>
  XP：聽新卡 10（重聽 3）・答對 15（同題再答 8）・答錯 3・口說 12（重複 5）・課文新句 8（重聽 3）・題型全部完成 +50・單元全部完成 +150。<br>
  屬性：課文跟讀→聽力、口說→口說、單字卡和測驗→詞彙（念例句也算單字練習 XP）。屬性每升 1 級，該類 XP +2%（上限 30%）。<br>
- 能力：${ABIL.map(a=>"Lv"+a.lv+" "+a.name+"："+a.desc).join("；")}。<br>${s.migXP?"已把之前的💵和練習紀錄換算成 "+s.migXP+" XP。":""}<br>寶藏會依累計 XP 自動開箱，經驗值不會被花掉。</details></div>`;drawAssets()};draw();RPG.onChange=draw;trCheck()}
-window.RPG={page,home,st,lvOf,need,gain,hints,avatar,TITLES,ABIL,TREASURES,CATS,trValue,money,worth};
+ 能力：${ABIL.map(a=>"Lv"+a.lv+" "+a.name+"："+a.desc).join("；")}。<br>${s.migXP?"已把之前的💵和練習紀錄換算成 "+s.migXP+" XP。":""}<br>寶藏會依累計 XP 自動開箱，經驗值不會被花掉。</details></div>`;drawAssets();el.querySelectorAll("details.rp-pet").forEach(x=>x.ontoggle=()=>{if(x.dataset.k==="shop")petOpen=x.open;else myOpen=x.open})};draw();
+ el.onclick=e=>{const b=e.target.closest?e.target.closest("button[data-buy]"):null;if(!b||b.disabled)return;petConfirm(b.getAttribute("data-buy"),p=>{draw();petToast(p)})};RPG.onChange=draw;trCheck()}
+window.RPG={page,home,st,lvOf,need,gain,hints,avatar,TITLES,ABIL,TREASURES,CATS,trValue,money,worth,PETS,netWorth};
 })();
