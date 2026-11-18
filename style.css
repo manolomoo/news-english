@@ -49,3 +49,25 @@ a.nav{color:var(--ac)}
 .rv-zh{font-size:26px;font-weight:700;color:var(--ac);overflow-wrap:anywhere}.rv-ex{line-height:1.5;overflow-wrap:anywhere}.rv-hint{font-size:14px}.rv-t{font-size:24px;font-weight:800}.rv-sum{font-size:18px;line-height:1.8}
 .rv-row{margin-top:14px;flex-wrap:nowrap}.rv-btn{display:block;min-height:56px;font-size:20px;text-align:center;text-decoration:none;line-height:1.6}.rv-ok{background:var(--ok);color:#fff;border-color:var(--ok)}.rv-bad{color:var(--bad);border-color:var(--bad)}
 .rv-card .rv-btn{width:100%;margin-top:10px}
+
+/* ===== 我的單字（取自投資英文，鍵 neMyWords1） ===== */
+.mw-pop{position:fixed;left:0;right:0;bottom:0;z-index:60;max-width:600px;margin:0 auto;background:var(--cd);color:var(--fg);border:1px solid var(--ln);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.22);padding:12px 16px calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px}
+.mw-ph{display:flex;align-items:center;gap:8px}.mw-w{flex:1;min-width:0;font-size:24px;font-weight:800;line-height:1.25;overflow-wrap:anywhere}
+.mw-sp,.mw-x{flex:none;width:46px;height:46px;border-radius:12px;border:1px solid var(--ln);background:var(--cd);color:var(--fg);font-size:20px;-webkit-tap-highlight-color:transparent}
+.mw-sub{font-size:13px;color:var(--mu);min-height:17px}
+.mw-in{width:100%;padding:12px;font-size:18px;border:1px solid var(--ln);border-radius:10px;background:var(--bg);color:var(--fg)}
+.mw-ps{font-size:14px;line-height:1.55;color:var(--mu);max-height:4.7em;overflow:auto}.mw-ps b,.mw-is b{color:var(--ac)}
+.mw-ok{flex:none;min-height:50px;font-size:18px}
+.mw-toast{display:none;position:fixed;left:50%;bottom:calc(30px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:99;background:#222;color:#fff;border-radius:999px;padding:10px 18px;font-size:15px;max-width:90vw;overflow-wrap:anywhere}
+.mw-panel{position:fixed;inset:0;z-index:98;background:var(--bg);overflow:auto;-webkit-overflow-scrolling:touch}
+.mw-pin{max-width:600px;margin:0 auto;padding:12px 16px 40px;display:flex;flex-direction:column;gap:10px}
+.mw-pb{display:flex;align-items:center;justify-content:space-between;font-size:20px}.mw-pb .b{flex:none;padding:10px 18px}
+.mw-hd2{display:flex;align-items:center;justify-content:space-between;font-size:18px}
+.mw-list{display:flex;flex-direction:column;gap:10px}
+.mw-it{border:1px solid var(--ln);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;background:var(--bg)}
+.mw-r1{display:flex;align-items:center;justify-content:space-between;gap:8px}.mw-iw{font-size:20px;font-weight:800;overflow-wrap:anywhere}
+.mw-it .mw-sp{width:44px;height:44px;font-size:18px}
+.mw-zh{font-size:17px;color:var(--ac);font-weight:650;overflow-wrap:anywhere}.mw-is{font-size:14px;line-height:1.55;color:var(--mu);overflow-wrap:anywhere}
+.mw-r3{display:flex;align-items:center;justify-content:space-between;gap:8px}.mw-ls{font-size:13px;color:var(--ac);text-decoration:none}
+.mw-del{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--ln);background:var(--cd);color:var(--bad);font-size:15px;font-weight:650}
+.mw-empty{font-size:15px;line-height:1.6}.mw-cr{font-size:12px;color:var(--mu)}

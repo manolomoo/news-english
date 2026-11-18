@@ -31,7 +31,7 @@ function cardKeys(c){return c.ex?[key(c),c.ex]:[key(c)]}
 function render(){const L=list();if(i>=L.length)i=0;const c=L[i];$("pl").textContent=playing?"⏸ 暫停":"▶ 回音法播放";grpLabels();
  $("ic").innerHTML=(window.ICONS&&window.ICONS[c.w])||"";$("w").textContent=c.w;$("tag").innerHTML=esc(c.pos.split(/[,，（(\[]/)[0].trim());$("ipa").textContent="";
  $("def").textContent="";$("zh").textContent=c.zh||"";
- $("ex").innerHTML=c.ex?`<div>${esc(c.ex)}</div><div class="mu">${esc(c.exzh||"")}</div>`+(c.ex2?`<div style="margin-top:6px">${esc(c.ex2)}</div><div class="mu">${esc(c.ex2zh||"")}</div>`:""):"";
+ $("ex").innerHTML=c.ex?`<div class="exn">${esc(c.ex)}</div><div class="mu">${esc(c.exzh||"")}</div>`+(c.ex2?`<div class="exn" style="margin-top:6px">${esc(c.ex2)}</div><div class="mu">${esc(c.ex2zh||"")}</div>`:""):"";
  grid()}
 async function play(){if(window.TTS&&TTS.unlock)TTS.unlock();TTS.cancel();const r=++run,s0=TTS.sess();playing=true;render();const ok=()=>run===r&&TTS.sess()===s0;const L=list();
  while(ok()&&i<L.length){render();const c=L[i],parts=cardKeys(c);
@@ -51,9 +51,8 @@ function textsHTML(){return W.texts.map(t=>{const ids=[];const body=t.paras.map(
   ${t.photo?`<figure class="ph"><img src="${esc(t.photo)}" alt="${esc(t.title)}" loading="lazy" style="object-position:${esc(t.photopos||"50% 50%")}" onerror="this.parentNode.style.display='none'"><figcaption>${esc(t.photocap||"")}</figcaption></figure>`:""}
   <div class="row"><button class="b p" data-a="all">▶ 全文連播</button><button class="b" data-a="echo">回音法逐句</button><button class="b" data-a="stop">⏹ 停止</button></div><div class="cue" style="min-height:20px"></div>
   ${t.zh?`<div class="row"><button class="b" data-a="zh">顯示中文</button></div>`:""}
-  <div class="story">${body}</div>${t.note?`<div class="mu" style="font-size:13px">${esc(t.note)}</div>`:""}<div class="mu" style="font-size:12px">點任一句可單獨聽。</div>${t.vocab?`<div class="vl"><b>本篇較難單字</b>${vocabHTML(t)}</div>`:""}</div>`}).join("")}
+  <div class="story">${body}</div>${t.note?`<div class="mu" style="font-size:13px">${esc(t.note)}</div>`:""}<div class="mu" style="font-size:12px">點任一句可單獨聽。長按或雙擊單字、拖選片語，可加入「我的單字」。</div>${t.vocab?`<div class="vl"><b>本篇較難單字</b>${vocabHTML(t)}</div>`:""}</div>`}).join("")}
 function bindTexts(){W.texts.forEach(t=>{const box=$("tx-"+t.id),cue=box.querySelector(".cue");
- box.querySelectorAll(".sn").forEach(e=>e.onclick=()=>{stop();const j=+e.dataset.j;e.classList.add("hl");play1(SENT[j]).then(()=>e.classList.remove("hl"))});
  box.querySelector('[data-a="stop"]').onclick=stop;
  const zb=box.querySelector('[data-a="zh"]');if(zb)zb.onclick=()=>{const on=box.classList.toggle("showzh");zb.textContent=on?"隱藏中文":"顯示中文"};
  box.querySelectorAll(".vw.pl").forEach(e=>e.onclick=()=>{stop();play1(e.dataset.k)});
@@ -89,6 +88,9 @@ $("o1").onclick=()=>once([key(list()[i])]);$("o2").onclick=()=>{const e=list()[i
 $("pv").onclick=()=>{stop();i=(i-1+list().length)%list().length;render()};$("nx").onclick=()=>{stop();i=(i+1)%list().length;render()};$("pl").onclick=()=>playing?stop():play();
 (function(){["pl","o1","o2"].forEach(function(id){var el=$(id);if(el&&TTS.unlock)el.addEventListener("pointerdown",function(){TTS.unlock()},{passive:true});});})();
 $("texts").innerHTML=textsHTML();bindTexts();
+/* 單擊句子＝延遲 300ms 播整句（讓雙擊／長按／拖選先開「我的單字」抽屜）；長按／雙擊／拖選＝查詞 */
+if(window.MW){MW.bindRich($("texts"),{sel:".sn",onTap:c=>{stop();const e=c,j=+e.dataset.j;e.classList.add("hl");play1(SENT[j]).then(()=>e.classList.remove("hl"))}});
+ MW.bindRich($("ex"),{sel:".exn"})}
 $("syn").innerHTML=synHTML();$("syn").querySelectorAll("tr").forEach(tr=>tr.onclick=()=>once([W.syn[+tr.dataset.k][0]]));
 const GN={"咖啡篇單字":"咖啡篇","快報焦點":"焦點快報","洞察篇單字":"洞察篇"};
 const gLast=G.map(()=>-1);
