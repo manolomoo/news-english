@@ -2,7 +2,8 @@
 (function(){
 /* 每週加一個單元：複製下面一行、改 id / n / file / dates / title 即可（id 一旦上線不要改，練習紀錄靠它） */
 const UNITS=[
- {id:"w1",n:1,file:"week01.html",dates:"2026/11/11",name:"第 1 週",title:"一杯 105 美元的咖啡・快報焦點・新聞洞察（大瀑布垃圾帶／汶萊／環球步行者）",count:"單字 46 張・課文 5 則・Say it",types:["cards","story","quiz","speak"]}];
+ {id:"w1",n:1,file:"week01.html",dates:"2026/11/11",name:"第 1 週",title:"一杯 105 美元的咖啡・快報焦點・新聞洞察（大瀑布垃圾帶／汶萊／環球步行者）",count:"單字 46 張・課文 5 則・Say it",types:["cards","story","quiz","speak"]},
+ {id:"w2",n:2,file:"week02.html",dates:"2026/11/18",name:"第 2 週",title:"SpaceX 回收星艦・快報焦點・新聞洞察（留學生／微軟當機／紫花風鈴木）",count:"單字 44 張・課文 9 則・Say it",types:["cards","story","quiz","speak"]}];
 const TN={cards:"單字圖卡",quiz:"小測驗",speak:"口說練習（Say it／Q&A）",hang:"吊人遊戲",story:"課文跟讀"};
 const RULE={cards:"每張單字卡都聽過一次（點卡、念單字或回音法都算）",quiz:"同一次練習中作答滿 10 題，且正確率 ≥ 80%",speak:"在 5 個不同的題目上按「看答案＋聽」並跟著說",hang:"猜對 3 個不同的單字",story:"課文每一句都聽過（每篇全文連播一次即可）"};
 const KEY="enNewsRW1";let MEM=null,LSOK=true;try{localStorage.setItem("__t","1");localStorage.removeItem("__t")}catch(e){LSOK=false}

@@ -4,8 +4,8 @@ const W=window.WEEK,$=id=>document.getElementById(id);
 const G=W.groups,R=[0.7,0.85,1.0];
 let g=0,i=0,rate=0.85,run=0,playing=false,score=0,done=0,qi=0,pk=null,dk=0,di=0;
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-const plain=s=>s.replace(/\{\d+\|([^}]+)\}/g,"$1").replace(/\s*\[\[[^\]]*\]\]/g,"").replace(/\s+/g," ").trim();
-const fmt=s=>esc(s).replace(/\{(\d+)\|([^}]+)\}/g,'<mark class="kw"><sup>$1</sup>$2</mark>').replace(/\[\[([^\]]*)\]\]/g,'<span class="gl">$1</span>');
+const plain=s=>s.replace(/\{\d*\|([^}]+)\}/g,"$1").replace(/\s*\[\[[^\]]*\]\]/g,"").replace(/\s+/g," ").trim();
+const fmt=s=>esc(s).replace(/\{(\d*)\|([^}]+)\}/g,(m,n,w)=>'<mark class="kw">'+(n?'<sup>'+n+'</sup>':'')+w+'</mark>').replace(/\[\[([^\]]*)\]\]/g,'<span class="gl">$1</span>');
 const key=c=>c.say||c.w;
 const list=()=>G[g].cards;
 const ALL=G.flatMap(x=>x.cards);
@@ -27,10 +27,13 @@ async function once(keys){if(window.TTS&&TTS.unlock)TTS.unlock();stop();await se
 /* ===== 單字圖卡 ===== */
 function grid(){$("ga").innerHTML=list().map((c,k)=>`<div class="ca${k===i?" cur":""}" data-k="${k}"><span class="sp">🔊</span>${(window.ICONS&&window.ICONS[c.w])?`<div class="ci">${window.ICONS[c.w]}</div>`:""}<div class="en">${esc(c.w)}</div><div class="zh">${esc(c.zq||c.zh||"")}</div><div class="tg">${esc(c.pos.split(/[,，（(\[]/)[0].trim())}</div></div>`).join("");
  $("ga").querySelectorAll(".ca").forEach(el=>el.onclick=()=>{stop();i=+el.dataset.k;render();once([key(list()[i])])})}
+/* 課文「本篇較難單字」→ 切到單字分頁並跳到該卡（找不到卡就不動） */
+function gotoCard(w){for(let a=0;a<G.length;a++){const k=G[a].cards.findIndex(c=>c.w===w);if(k>=0){if(typeof showSec==="function")showSec("v",true);g=a;i=k;render();return true}}return false}
 function cardKeys(c){return c.ex?[key(c),c.ex]:[key(c)]}
 function render(){const L=list();if(i>=L.length)i=0;const c=L[i];$("pl").textContent=playing?"⏸ 暫停":"▶ 回音法播放";grpLabels();
  $("ic").innerHTML=(window.ICONS&&window.ICONS[c.w])||"";$("w").textContent=c.w;$("tag").innerHTML=esc(c.pos.split(/[,，（(\[]/)[0].trim());$("ipa").textContent="";
  $("def").textContent="";$("zh").textContent=c.zh||"";
+ if($("ph"))$("ph").innerHTML=c.photo?`<img src="${esc(c.photo)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML=''">${c.newstitle?`<span>${esc(c.newstitle)}</span>`:""}`:"";
  $("ex").innerHTML=c.ex?`<div class="exn">${esc(c.ex)}</div><div class="mu">${esc(c.exzh||"")}</div>`+(c.ex2?`<div class="exn" style="margin-top:6px">${esc(c.ex2)}</div><div class="mu">${esc(c.ex2zh||"")}</div>`:""):"";
  grid()}
 async function play(){if(window.TTS&&TTS.unlock)TTS.unlock();TTS.cancel();const r=++run,s0=TTS.sess();playing=true;render();const ok=()=>run===r&&TTS.sess()===s0;const L=list();
@@ -44,7 +47,7 @@ const SENT=[];let sj=0;
 const zhOf=(t,pi,si)=>{const z=t.zh&&t.zh[pi]&&t.zh[pi][si];return z?`<div class="zhs">${esc(z)}</div>`:""};
 const CARD={};ALL.forEach(c=>{CARD[c.w]=c});
 function vocabHTML(t){return (t.vocab||[]).map(v=>{const c=CARD[v[0]],zh=v[1]||(c&&c.zh)||"",k=c?key(c):v[0],can=!!(window.UNIT_C&&window.UNIT_C[k]);
-  return `<div class="vw${can?" pl":""}"${can?` data-k="${esc(k)}"`:""}>${v[2]?`<b class="vn">${v[2]}.</b>`:""}<b>${esc(v[0])}</b>${can?" 🔊":""} <span class="mu">${esc(zh)}</span></div>`}).join("")}
+  return `<div class="vw${can?" pl":""}${c?" gc":""}"${can?` data-k="${esc(k)}"`:""}${c?` data-w="${esc(v[0])}"`:""}>${v[2]?`<b class="vn">${v[2]}.</b>`:""}<b>${esc(v[0])}</b>${can?" 🔊":""} <span class="mu">${esc(zh)}</span></div>`}).join("")}
 function textsHTML(){return W.texts.map(t=>{const ids=[];const body=t.paras.map((p,pi)=>`<div class="pa">`+p.map((s,si)=>{const j=sj++;const pl=plain(s);SENT.push(pl);ids.push(j);return `<div class="sn" id="s${j}" data-j="${j}">${fmt(s)}${zhOf(t,pi,si)}</div>`}).join("")+`</div>`).join("");
   t.ids=ids;
   return `<div class="box tx" id="tx-${t.id}"><b style="font-size:18px">${esc(t.title)}</b><div class="mu" style="font-size:13px">${esc(t.tag)}</div>
@@ -55,7 +58,7 @@ function textsHTML(){return W.texts.map(t=>{const ids=[];const body=t.paras.map(
 function bindTexts(){W.texts.forEach(t=>{const box=$("tx-"+t.id),cue=box.querySelector(".cue");
  box.querySelector('[data-a="stop"]').onclick=stop;
  const zb=box.querySelector('[data-a="zh"]');if(zb)zb.onclick=()=>{const on=box.classList.toggle("showzh");zb.textContent=on?"隱藏中文":"顯示中文"};
- box.querySelectorAll(".vw.pl").forEach(e=>e.onclick=()=>{stop();play1(e.dataset.k)});
+ box.querySelectorAll(".vw").forEach(e=>e.onclick=()=>{stop();if(e.dataset.k)play1(e.dataset.k);if(e.dataset.w&&CARD[e.dataset.w])gotoCard(e.dataset.w)});
  box.querySelector('[data-a="all"]').onclick=async()=>{stop();const r=run,s0=TTS.sess();const ok=()=>run===r&&TTS.sess()===s0;
   for(let n=0;n<t.ids.length&&ok();n++){const j=t.ids[n];const e=$("s"+j);e.classList.add("hl");cueEl(cue,"listen","【"+(n+1)+"/"+t.ids.length+"】");const d=await play1(SENT[j]);e.classList.remove("hl");if(d==null||!ok())return;if(!await wait(.35))return}if(ok())cue.textContent=""};
  box.querySelector('[data-a="echo"]').onclick=async()=>{stop();const r=run,s0=TTS.sess();const ok=()=>run===r&&TTS.sess()===s0;
@@ -92,7 +95,7 @@ $("texts").innerHTML=textsHTML();bindTexts();
 if(window.MW){MW.bindRich($("texts"),{sel:".sn",onTap:c=>{stop();const e=c,j=+e.dataset.j;e.classList.add("hl");play1(SENT[j]).then(()=>e.classList.remove("hl"))}});
  MW.bindRich($("ex"),{sel:".exn"})}
 $("syn").innerHTML=synHTML();$("syn").querySelectorAll("tr").forEach(tr=>tr.onclick=()=>once([W.syn[+tr.dataset.k][0]]));
-const GN={"咖啡篇單字":"咖啡篇","快報焦點":"焦點快報","洞察篇單字":"洞察篇"};
+const GN={"咖啡篇單字":"咖啡篇","快報焦點":"焦點快報","洞察篇單字":"洞察篇","太空篇單字":"太空篇"};
 const gLast=G.map(()=>-1);
 /* 分組按鈕：簡稱＋張數。選中組用目前 i，其他組用上次停留張數（沒去過則該組的起始張，同 startIdx 規則） */
 function grpLabels(){gLast[g]=i;G.forEach((x,k)=>{const b=$("grp").children[k];if(!b)return;const n=x.cards.length,cur=k===g?i:(gLast[k]>=0?gLast[k]:startIdx(k));
