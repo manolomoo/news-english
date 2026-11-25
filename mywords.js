@@ -5,7 +5,7 @@
    中文意思離線自動填入：本週 WEEK.groups[].cards → dict/en-zh.json（ECDICT, MIT License）→ 都沒有就讓使用者自己打。
    首頁：MW.home(el) 渲染列表區塊；單元頁：MW.bindRich(box,{sel,onTap}) 綁課文句。 */
 (function(){
-const K="neMyWords1",VER=String(window.PAGEVER||"25");
+const K="neMyWords1",VER=String(window.PAGEVER||"26");
 let MEM=null;
 const load=()=>{try{const v=localStorage.getItem(K);if(v){const a=JSON.parse(v);if(Array.isArray(a))return a.filter(x=>x&&typeof x.w==="string")}}catch(e){}return MEM||[]};
 const save=a=>{MEM=a;try{localStorage.setItem(K,JSON.stringify(a))}catch(e){}};
@@ -38,7 +38,7 @@ const cards=()=>{const W=window.WEEK;if(!W)return[];let a=[];if(Array.isArray(W.
 /* → Promise<{zh,src:"card"|"dict"|""}> */
 async function lookup(text){
  const cs=cands(text),single=!/\s/.test(text.trim()),CL=cards();
- if(CL.length)for(const c of (single?cs:[cs[0]])){const h=CL.find(x=>nkey(x.w)===c);if(h&&h.zh)return{zh:h.zh,src:"card"}}
+ if(CL.length)for(const c of (single?cs:[cs[0]])){const h=CL.find(x=>nkey(x.w)===c);if(h&&h.zh)return{zh:h.zh,src:"card",ipa:h.ipa||""}}
  const d=await dict();
  for(const c of (single?cs:[cs[0]]))if(d[c])return{zh:d[c],src:"dict"};
  return{zh:"",src:""}}
@@ -127,13 +127,14 @@ async function openPop(h){
  if(!pop){pop=document.createElement("div");pop.className="mw-pop";pop.setAttribute("role","dialog");document.body.appendChild(pop)}
  const mine=cur;
  pop.innerHTML=`<div class="mw-ph"><div class="mw-w" id="mwW"></div><button type="button" class="mw-sp" data-a="sp" aria-label="發音">🔊</button><button type="button" class="mw-x" data-a="x" aria-label="關閉">✕</button></div>
- <div class="mw-sub" id="mwSub"></div><input class="mw-in" id="mwZh" type="text" placeholder="中文意思（可自己輸入）" enterkeyhint="done" autocomplete="off" autocapitalize="off">
+ <div class="mw-ipa" id="mwIpa"></div><div class="mw-sub" id="mwSub"></div><input class="mw-in" id="mwZh" type="text" placeholder="中文意思（可自己輸入）" enterkeyhint="done" autocomplete="off" autocapitalize="off">
  <div class="mw-ps">${hiSent(sent,text)}</div><button type="button" class="b p mw-ok" data-a="ok"></button>`;
  const $=s=>pop.querySelector(s),inp=$("#mwZh");
  const setText=x=>{mine.text=x;$("#mwW").textContent=x;$("[data-a=ok]").textContent=find(x)?"更新":"加入我的單字"};
  setText(text);inp.addEventListener("input",()=>{mine.dirty=true});
  if(ex){$("#mwSub").textContent="⭐ 已在我的單字，可改意思後按「更新」";inp.value=ex.zh||""}else $("#mwSub").textContent="查詢中…";
  const hit=await lookup(text);if(cur!==mine||!pop)return;
+ if(hit.ipa)$("#mwIpa").textContent=hit.ipa;
  let shown=text;
  if(first&&hit.src==="dict"){shown=text.toLowerCase();setText(shown)}   // 句首大寫的普通字 → 小寫
  else if(first){const lo=text.toLowerCase(),h2=await lookup(lo);if(cur!==mine||!pop)return;if(h2.zh&&h2.src==="dict"&&h2.zh===hit.zh){shown=lo;setText(lo)}}

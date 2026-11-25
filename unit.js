@@ -25,13 +25,14 @@ const echoGap=d=>Math.max(1,d+.3),shadowGap=d=>Math.max(1.5,d*1.25+.6);
 function stop(){TTS.cancel();run++;playing=false;setCue("");clearHl();render()}
 async function once(keys){if(window.TTS&&TTS.unlock)TTS.unlock();stop();await seq(keys)}
 /* ===== 單字圖卡 ===== */
-function grid(){$("ga").innerHTML=list().map((c,k)=>`<div class="ca${k===i?" cur":""}" data-k="${k}"><span class="sp">🔊</span>${(window.ICONS&&window.ICONS[c.w])?`<div class="ci">${window.ICONS[c.w]}</div>`:""}<div class="en">${esc(c.w)}</div><div class="zh">${esc(c.zq||c.zh||"")}</div><div class="tg">${esc(c.pos.split(/[,，（(\[]/)[0].trim())}</div></div>`).join("");
+function smallIpa(c){const p=c.ipa||"",m=/US\s*(\/[^/]+\/)/.exec(p),u=m?m[1]:(p.split(/[；;]/).length>1?"":p);return u&&u.length<=20&&!/\s/.test(u)?u:""}
+function grid(){$("ga").innerHTML=list().map((c,k)=>`<div class="ca${k===i?" cur":""}" data-k="${k}"><span class="sp">🔊</span>${(window.ICONS&&window.ICONS[c.w])?`<div class="ci">${window.ICONS[c.w]}</div>`:""}<div class="en">${esc(c.w)}</div>${smallIpa(c)?`<div class="ip">${esc(smallIpa(c))}</div>`:""}<div class="zh">${esc(c.zq||c.zh||"")}</div><div class="tg">${esc(c.pos.split(/[,，（(\[]/)[0].trim())}</div></div>`).join("");
  $("ga").querySelectorAll(".ca").forEach(el=>el.onclick=()=>{stop();i=+el.dataset.k;render();once([key(list()[i])])})}
 /* 課文「本篇較難單字」→ 切到單字分頁並跳到該卡（找不到卡就不動） */
 function gotoCard(w){for(let a=0;a<G.length;a++){const k=G[a].cards.findIndex(c=>c.w===w);if(k>=0){if(typeof showSec==="function")showSec("v",true);g=a;i=k;render();return true}}return false}
 function cardKeys(c){return c.ex?[key(c),c.ex]:[key(c)]}
 function render(){const L=list();if(i>=L.length)i=0;const c=L[i];$("pl").textContent=playing?"⏸ 暫停":"▶ 回音法播放";grpLabels();
- $("ic").innerHTML=(window.ICONS&&window.ICONS[c.w])||"";$("w").textContent=c.w;$("tag").innerHTML=esc(c.pos.split(/[,，（(\[]/)[0].trim());$("ipa").textContent="";
+ $("ic").innerHTML=(window.ICONS&&window.ICONS[c.w])||"";$("w").textContent=c.w;$("tag").innerHTML=esc(c.pos.split(/[,，（(\[]/)[0].trim());$("ipa").textContent=c.ipa||"";
  $("def").textContent="";$("zh").textContent=c.zh||"";
  if($("ph"))$("ph").innerHTML=c.photo?`<img src="${esc(c.photo)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML=''">${c.newstitle?`<span>${esc(c.newstitle)}</span>`:""}`:"";
  $("ex").innerHTML=c.ex?`<div class="exn">${esc(c.ex)}</div><div class="mu">${esc(c.exzh||"")}</div>`+(c.ex2?`<div class="exn" style="margin-top:6px">${esc(c.ex2)}</div><div class="mu">${esc(c.ex2zh||"")}</div>`:""):"";
