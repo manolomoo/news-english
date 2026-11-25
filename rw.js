@@ -23,7 +23,7 @@ const css=document.createElement("style");css.textContent=`.rw-cf{position:fixed
 .rwr{font-size:12px;color:var(--mu);line-height:1.6}`;document.head.appendChild(css);
 window.RW={LSOK:()=>LSOK,toast,emit,UNITS,ust,tst,TN,RULE,pget,ld,
 page(uid,cfg){
-const U=UNITS.find(x=>x.id===uid);const box=document.getElementById("rw");
+const U=UNITS.find(x=>x.id===uid);const box=document.getElementById("rw")||document.createElement("div");
 const sess={quiz:[0,0],hw:null};cfg.allCards=cfg.cards;RW.cfg=cfg;RW.uid=uid;
 function upd(t,fn){const d=ld();d[uid]=d[uid]||{};const x=d[uid][t]=d[uid][t]||{};const before=ust(U),bt=x.c?2:x.s?1:0;fn(x);x.s=1;sv(d);const at=x.c?2:1,after=ust(U);if(at===2&&bt!==2)emit({uid,t:"crown",ty:t});if(after===2&&before!==2)emit({uid,t:"king"});
 draw()}
@@ -32,14 +32,14 @@ const r=document.getElementById("rwreset");if(r)r.onclick=e=>{e.preventDefault()
 const heard=(t,list,k)=>{if(!list.includes(k))return;upd(t,x=>{x.h=x.h||[];if(!x.h.includes(k))x.h.push(k);if(x.h.length>=list.length)x.c=1})};
 const _p=window.play1;window.play1=function(k){cfg.onPlay&&cfg.onPlay(k);heard("cards",cfg.cards,k);if(cfg.story)heard("story",cfg.story,k);return _p.apply(this,arguments)};
 const _q=window.quiz;window.quiz=function(){_q.apply(this,arguments);const sc=cfg.score(),dn=cfg.done();if(dn>sess.quiz[1]){const ok=sc>sess.quiz[0];sess.quiz=[sc,dn];cfg.onQuiz&&cfg.onQuiz(ok);upd("quiz",x=>{const pct=Math.round(sc/dn*100);if(dn>=10&&(!x.b||pct>parseInt(x.b)))x.b=pct+"%（"+dn+" 題）";if(dn>=10&&sc/dn>=.8)x.c=1})}};
-cfg.speakBtn.addEventListener("click",()=>{const k=cfg.speakText();cfg.onSpeak&&cfg.onSpeak(k);upd("speak",x=>{x.h=x.h||[];if(!x.h.includes(k))x.h.push(k);if(x.h.length>=5)x.c=1})});
+if(cfg.speakBtn)cfg.speakBtn.addEventListener("click",()=>{const k=cfg.speakText();cfg.onSpeak&&cfg.onSpeak(k);upd("speak",x=>{x.h=x.h||[];if(!x.h.includes(k))x.h.push(k);if(x.h.length>=5)x.c=1})});
 if(cfg.hang){const _h=window.hang;window.hang=function(){_h.apply(this,arguments);const w=cfg.hang();if(w&&w!==sess.hw){sess.hw=w;cfg.onHang&&cfg.onHang(w)}if(w)upd("hang",x=>{x.h=x.h||[];if(!x.h.includes(w))x.h.push(w);if(x.h.length>=3)x.c=1})}}
 const P=t=>uid+"|"+t+"|";
 function mark(el,key,cls){if(!el)return;let m=el.querySelector(":scope>.pm");if(!m){m=document.createElement("div");m.className="pm";el.appendChild(m)}m.textContent=POO(pget(key))}
 function deco(){document.querySelectorAll("#ga .ca").forEach(el=>{const c=cfg.list()[+el.dataset.k];if(c)mark(el,P("cards")+cfg.cardKey(c))});
 const c=cfg.list()[cfg.idx()];let m=document.getElementById("pmw");if(!m){m=document.createElement("div");m.id="pmw";m.className="pm";document.getElementById("w").after(m)}if(c)m.textContent=POO(pget(P("cards")+cfg.cardKey(c)));
-let q=document.getElementById("pmq");if(!q){q=document.createElement("div");q.id="pmq";q.className="pm";document.getElementById("qo").before(q)}q.textContent=POO(pget(P("quiz")+cfg.qkey()));
-let sp=document.getElementById("pms");if(!sp){sp=document.createElement("div");sp.id="pms";sp.className="pm";(cfg.speakBtn.parentNode.classList.contains('row')?cfg.speakBtn.parentNode:cfg.speakBtn).before(sp)}sp.textContent=POO(pget(P("speak")+cfg.speakText()));
+if(document.getElementById("qo")){let q=document.getElementById("pmq");if(!q){q=document.createElement("div");q.id="pmq";q.className="pm";document.getElementById("qo").before(q)}q.textContent=POO(pget(P("quiz")+cfg.qkey()))}
+if(cfg.speakBtn&&cfg.speakBtn.parentNode){let sp=document.getElementById("pms");if(!sp){sp=document.createElement("div");sp.id="pms";sp.className="pm";(cfg.speakBtn.parentNode.classList.contains('row')?cfg.speakBtn.parentNode:cfg.speakBtn).before(sp)}sp.textContent=POO(pget(P("speak")+cfg.speakText()))}
 if(cfg.story)cfg.story.forEach((k,j)=>mark(document.getElementById("s"+j),P("story")+k));
 if(cfg.hang){let h=document.getElementById("pmh");if(!h){h=document.createElement("div");h.id="pmh";h.className="pm";document.getElementById("hz").after(h)}h.textContent=POO(pget(P("hang")+cfg.hkey()))}}
 RW.deco=deco;const _r=window.render;window.render=function(){_r.apply(this,arguments);deco()};

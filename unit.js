@@ -1,4 +1,4 @@
-/* 單元頁引擎：單字圖卡（回音法）→ 課文跟讀 → 其他（近義辨析、小測驗、口說練習）。資料來自 window.WEEK。
+/* 單元頁引擎：單字圖卡（回音法）→ 課文跟讀 → 其他（三款小遊戲；舊的近義辨析／小測驗／口說區塊已移除，相關函式在沒有 DOM 時為 no-op）。資料來自 window.WEEK。
    注意：render / quiz / drill / play1 必須是全域函式（rw.js 會包裝它們來記錄💵與XP）。 */
 const W=window.WEEK,$=id=>document.getElementById(id);
 const G=W.groups,R=[0.7,0.85,1.0];
@@ -75,19 +75,19 @@ function prep(q){const c=q.c;q.say=key(c);q.k=q.t+"|"+key(c);
  if(q.t==="def"){const re=/\s|\//.test(c.w)?null:new RegExp("\\b"+c.w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\w*","gi");q.q=re?c.def.replace(re,"＿＿＿"):c.def;q.z="哪個單字的意思是？";q.a=c.w;q.o=shuf([c,...shuf(ALL.filter(x=>x!==c)).slice(0,3)]).map(x=>x.w)}
  else if(q.t==="w2zh"){q.q=c.w;q.z="中文意思是？（"+c.pos.split(/[,（(\[]/)[0]+"）";q.a=zq(c);const d=[];shuf(ALL.filter(x=>x!==c&&x.zh&&zq(x)!==q.a)).forEach(x=>{if(d.length<3&&!d.includes(zq(x)))d.push(zq(x))});q.o=shuf([q.a,...d])}
  else{q.q=zq(c);q.z="哪個英文單字／詞組？";q.a=c.w;q.o=shuf([c,...shuf(ALL.filter(x=>x!==c&&x.zh&&zq(x)!==zq(c))).slice(0,3)]).map(x=>x.w)}}
-function quiz(){const q=Q[qi];if(!q.o)prep(q);$("sc").textContent="答對 "+score+" / "+done;$("qw").textContent=q.q;$("qz").textContent=q.z;$("qo").innerHTML="";
+function quiz(){if(!$("qo"))return;const q=Q[qi];if(!q.o)prep(q);$("sc").textContent="答對 "+score+" / "+done;$("qw").textContent=q.q;$("qz").textContent=q.z;$("qo").innerHTML="";
  q.o.forEach(o=>{const b=document.createElement("button");b.className="b";b.textContent=o;if(pk&&o===q.a){b.style.background="var(--ok)";b.style.color="#fff"}else if(pk===o)b.style.color="var(--bad)";
   b.onclick=()=>{if(pk)return;pk=o;done++;if(o===q.a)score++;quiz();play1(q.say)};$("qo").appendChild(b)});
  $("qr").textContent=pk?(pk===q.a?"答對了！Well done 👏":"正確答案是 "+q.a):"";$("qr").style.color=pk===q.a?"var(--ok)":"var(--bad)";$("qn").style.display=pk?"":"none"}
-$("qn").onclick=()=>{pk=null;let n=qi;while(n===qi)n=Math.floor(Math.random()*Q.length);qi=n;Q[qi].o=null;quiz()};
+if($("qn"))$("qn").onclick=()=>{pk=null;let n=qi;while(n===qi)n=Math.floor(Math.random()*Q.length);qi=n;Q[qi].o=null;quiz()};
 /* ===== 口說練習：Say it／Practice／Q&A ===== */
 const DK=W.decks;
-function drill(){const d=DK[dk],it=d.items[di];$("dlab").textContent=d.kind==="say"?"看到中文，先自己用英文說說看：":"先自己說說看（可以點題目聽一次）：";
+function drill(){if(!$("dq"))return;const d=DK[dk],it=d.items[di];$("dlab").textContent=d.kind==="say"?"看到中文，先自己用英文說說看：":"先自己說說看（可以點題目聽一次）：";
  $("dq").textContent=it.q;$("da").textContent=d.kind==="say"?it.a.join(" / "):it.a[0];$("da").style.visibility="hidden";
  $("dnote").textContent=(it.note||"")+(it.tag?"（"+it.tag+"）":"")||"";$("dnote").style.display="none";$("dpos").textContent=d.name+"　"+(di+1)+" / "+d.items.length}
-$("dr").onclick=()=>{$("da").style.visibility="visible";$("dnote").style.display="";const d=DK[dk],it=d.items[di];once(d.kind==="say"?it.a:[it.a[0]])};
-$("dn").onclick=()=>{stop();const n=DK[dk].items.length;di=n>1?(di+1+Math.floor(Math.random()*(n-1)))%n:0;drill()};
-$("dq").onclick=()=>{if(DK[dk].kind==="qa")once([DK[dk].items[di].q.replace(/^(Q\d|Question):\s*/,"")])};
+if($("dr"))$("dr").onclick=()=>{$("da").style.visibility="visible";$("dnote").style.display="";const d=DK[dk],it=d.items[di];once(d.kind==="say"?it.a:[it.a[0]])};
+if($("dn"))$("dn").onclick=()=>{stop();const n=DK[dk].items.length;di=n>1?(di+1+Math.floor(Math.random()*(n-1)))%n:0;drill()};
+if($("dq"))$("dq").onclick=()=>{if(DK[dk].kind==="qa")once([DK[dk].items[di].q.replace(/^(Q\d|Question):\s*/,"")])};
 $("o1").onclick=()=>once([key(list()[i])]);$("o2").onclick=()=>{const e=list()[i].ex;if(e)once([e])};
 $("pv").onclick=()=>{stop();i=(i-1+list().length)%list().length;render()};$("nx").onclick=()=>{stop();i=(i+1)%list().length;render()};$("pl").onclick=()=>playing?stop():play();
 (function(){["pl","o1","o2"].forEach(function(id){var el=$(id);if(el&&TTS.unlock)el.addEventListener("pointerdown",function(){TTS.unlock()},{passive:true});});})();
@@ -95,7 +95,7 @@ $("texts").innerHTML=textsHTML();bindTexts();
 /* 單擊句子＝延遲 300ms 播整句（讓雙擊／長按／拖選先開「我的單字」抽屜）；長按／雙擊／拖選＝查詞 */
 if(window.MW){MW.bindRich($("texts"),{sel:".sn",onTap:c=>{stop();const e=c,j=+e.dataset.j;e.classList.add("hl");play1(SENT[j]).then(()=>e.classList.remove("hl"))}});
  MW.bindRich($("ex"),{sel:".exn"})}
-$("syn").innerHTML=synHTML();$("syn").querySelectorAll("tr").forEach(tr=>tr.onclick=()=>once([W.syn[+tr.dataset.k][0]]));
+if($("syn")){$("syn").innerHTML=synHTML();$("syn").querySelectorAll("tr").forEach(tr=>tr.onclick=()=>once([W.syn[+tr.dataset.k][0]]))}
 const GN={"咖啡篇單字":"咖啡篇","快報焦點":"焦點快報","洞察篇單字":"洞察篇","太空篇單字":"太空篇"};
 const gLast=G.map(()=>-1);
 /* 分組按鈕：簡稱＋張數。選中組用目前 i，其他組用上次停留張數（沒去過則該組的起始張，同 startIdx 規則） */
@@ -103,7 +103,7 @@ function grpLabels(){gLast[g]=i;G.forEach((x,k)=>{const b=$("grp").children[k];i
  b.innerHTML=esc(GN[x.name]||x.name)+"<small>"+(cur+1)+"/"+n+"</small>";b.className=k===g?"on":""})}
 (function(){const el=$("grp");el.innerHTML="";G.forEach((x,k)=>{const b=document.createElement("button");b.onclick=()=>{stop();g=k;i=startIdx();render()};el.appendChild(b)})})();
 seg($("rate"),R.map(r=>r+"x"),R.indexOf(rate),k=>{rate=R[k]});
-seg($("dkseg"),DK.map(x=>x.name),dk,k=>{stop();dk=k;di=0;drill()});
+if($("dkseg"))seg($("dkseg"),DK.map(x=>x.name),dk,k=>{stop();dk=k;di=0;drill()});
 if(!TTS.supported())$("nov").style.display="";
 try{qi=Math.floor(Math.random()*Q.length);setCue("");i=startIdx();render();quiz();drill();window.__unitReady=1}catch(e){console.error(e);document.body.insertAdjacentHTML("afterbegin","<div style='padding:12px;color:#d64545'>載入失敗："+e+"</div>")}
-RW.page(W.uid,{qans:()=>Q[qi].a,list:()=>list(),idx:()=>i,cardKey:c=>key(c),qkey:()=>Q[qi].k,drillFn:"drill",cards:ALL.map(key),exCard:Object.fromEntries(ALL.flatMap(c=>[c.ex,c.ex2].filter(Boolean).map(e=>[e,key(c)]))),story:SENT,score:()=>score,done:()=>done,speakBtn:$("dr"),speakText:()=>$("da").textContent});RPG.page();
+RW.page(W.uid,{qans:()=>Q[qi].a,list:()=>list(),idx:()=>i,cardKey:c=>key(c),qkey:()=>Q[qi].k,drillFn:"drill",cards:ALL.map(key),exCard:Object.fromEntries(ALL.flatMap(c=>[c.ex,c.ex2].filter(Boolean).map(e=>[e,key(c)]))),story:SENT,score:()=>score,done:()=>done,speakBtn:$("dr"),speakText:()=>$("da")?$("da").textContent:""});RPG.page();
