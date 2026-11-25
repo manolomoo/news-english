@@ -5,7 +5,7 @@
    中文意思離線自動填入：本週 WEEK.groups[].cards → dict/en-zh.json（ECDICT, MIT License）→ 都沒有就讓使用者自己打。
    首頁：MW.home(el) 渲染列表區塊；單元頁：MW.bindRich(box,{sel,onTap}) 綁課文句。 */
 (function(){
-const K="neMyWords1",VER=String(window.PAGEVER||"29");
+const K="neMyWords1",VER=String(window.PAGEVER||"30");
 let MEM=null;
 const load=()=>{try{const v=localStorage.getItem(K);if(v){const a=JSON.parse(v);if(Array.isArray(a))return a.filter(x=>x&&typeof x.w==="string")}}catch(e){}return MEM||[]};
 const save=a=>{MEM=a;try{localStorage.setItem(K,JSON.stringify(a))}catch(e){}};

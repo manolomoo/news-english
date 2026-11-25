@@ -53,6 +53,17 @@ function say(text){if(!text||!hasAudio(text)||!window.TTS)return;try{TTS.unlock&
 function xpNow(){try{return RPG.st().xp||0}catch(e){return 0}}
 function gainXP(ok,isNew){try{RPG.gain({t:"quiz",ok:!!ok,isNew:!!isNew,uid:W.uid})}catch(e){}}
 function confetti(){const f=document.createElement("div");f.className="gm-conf";for(let k=0;k<22;k++){const s=document.createElement("span");s.textContent=["🎉","✨","💎","👑","🎊"][k%5];s.style.left=(Math.random()*96)+"vw";s.style.animationDelay=(Math.random()*.6)+"s";f.appendChild(s)}document.body.appendChild(f);setTimeout(()=>f.remove(),3400)}
+/* ---- 破紀錄：Q 版佛朗明哥小人（inline SVG；動畫全在 style.css 的 .gm-dancer）---- */
+/* SVG 與 rpg.js 共用（RPG.dancerSVG），避免兩份不一致 */
+const DN_SVG=(window.RPG&&RPG.dancerSVG)||"";
+function mountDancer(host){
+ if(!host)return null;const old=host.querySelector(".gm-dancer");if(old)old.remove();
+ const d=document.createElement("button");d.type="button";d.className="gm-dancer";d.setAttribute("aria-label","再看她跳一次");d.innerHTML=DN_SVG;
+ const play=()=>{d.classList.remove("go","rest");void d.offsetWidth;d.classList.add("go")};
+ d.addEventListener("click",e=>{e.stopPropagation();play()});
+ d.addEventListener("animationend",e=>{if(e.animationName==="gmdnArmR")d.classList.add("rest")});
+ host.appendChild(d);play();return d}
+window.GmDancer={mount:mountDancer,confetti:confetti};
 function stopAudio(){try{window.TTS&&TTS.cancel()}catch(e){}}
 const unlock=()=>{try{window.TTS&&TTS.unlock&&TTS.unlock()}catch(e){}};
 
@@ -77,7 +88,7 @@ function start(id,auto){
   el.querySelector(".gm-h").innerHTML=headHTML(meta);S.stat();
   S.body().innerHTML=`<div class="gm-end"><div class="gm-trophy">${rec?"🏆":"🎀"}</div>${rec?'<div class="gm-rec">新紀錄！</div>':""}<div class="gm-big">${S.score}<small> 分</small></div><div class="gm-res"><div><b>${acc}%</b><span>正確率</span></div><div><b>+${xp}</b><span>本輪 XP</span></div><div><b>${Math.max(prev,S.score)}</b><span>本週最佳</span></div></div><div class="row"><button class="b p gm-again">再玩一次</button></div></div>`;
   S.body().querySelector(".gm-again").onclick=()=>{unlock();stopAudio();start(id,true)};
-  if(rec)confetti()};
+  if(rec){confetti();mountDancer(S.body().querySelector(".gm-end"))}};
  S.stat();
  ({flip:runFlip,listen:runListen,cloze:runCloze})[id](S);
 }

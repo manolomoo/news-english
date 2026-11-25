@@ -187,6 +187,19 @@ const css=document.createElement("style");css.textContent=`
 .rp-mini .rp-av{border-width:3px}.rp-mini b{font-size:13px}.rp-mini .rp-bar{height:7px;margin-top:3px}
 .rp-xp{position:fixed;right:40px;top:64px;z-index:97;font-weight:900;font-size:20px;color:#7c5cff;pointer-events:none;animation:rpx 1.3s ease forwards;text-shadow:0 1px 0 #fff}
 @keyframes rpx{0%{opacity:0;transform:translateY(-8px) scale(.7)}20%{opacity:1;transform:translateY(0) scale(1.15)}100%{opacity:0;transform:translateY(40px)}}
+.rp-peek{position:fixed;right:192px;top:10px;z-index:95;display:flex;align-items:flex-start;gap:2px;pointer-events:none;animation:rppk 2s ease both}
+.rp-peek *{pointer-events:none}
+.rp-peek svg{width:62px;height:52px;display:block;overflow:hidden;flex:0 0 auto;transform-box:view-box}
+.rp-peek svg *{transform-box:view-box}
+.rp-peek .dn-n1,.rp-peek .dn-n2,.rp-peek .dn-n3{display:none}
+.rp-peek-b{position:relative;margin-top:6px;background:#fff;color:#c4284f;border:1.5px solid #e0307a;border-radius:10px;padding:2px 7px;font-size:12px;font-weight:800;white-space:nowrap;order:-1;box-shadow:0 2px 6px #0002}
+.rp-peek-b:after{content:"";position:absolute;right:-5px;top:8px;border:4px solid transparent;border-left:5px solid #e0307a;border-right:0}
+.rp-peek .dn-armR{animation:rppw .5s ease-in-out .35s 3 alternate both;transform-origin:74px 63px}
+.rp-peek .dn-head{animation:rppn .6s ease-in-out .3s 3 alternate both;transform-origin:60px 56px}
+@keyframes rppk{0%{opacity:0;transform:translateX(26px)}14%{opacity:1;transform:none}84%{opacity:1;transform:none}100%{opacity:0;transform:translateX(10px)}}
+@keyframes rppw{from{transform:rotate(0)}to{transform:rotate(-55deg)}}
+@keyframes rppn{from{transform:rotate(-3deg)}to{transform:rotate(4deg)}}
+@media (prefers-reduced-motion:reduce){.rp-peek .dn-armR,.rp-peek .dn-head{animation:none}.rp-peek{animation-name:rppk2}@keyframes rppk2{0%{opacity:0}12%,85%{opacity:1}100%{opacity:0}}}
 .rp-up{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:#0008;animation:rpf 3.2s ease forwards}
 .rp-up>div{background:var(--cd,#fff);color:var(--fg);border-radius:22px;padding:22px 26px;text-align:center;border:3px solid #7c5cff;max-width:86vw;animation:rpz .5s cubic-bezier(.2,1.6,.4,1)}
 .rp-up h2{margin:6px 0;font-size:30px;background:linear-gradient(90deg,#7c5cff,#f5b301);-webkit-background-clip:text;color:transparent}
@@ -270,6 +283,35 @@ function trCheck(delay){const s=st(),got=owned(s.xp);
  if(!s.trInit){s.trInit=1;s.trSeen=got.map(t=>t.id);sv(s);if(got.length)openBox(got,true);return got}
  const seen=Array.isArray(s.trSeen)?s.trSeen:[],nw=got.filter(t=>seen.indexOf(t.id)<0);if(!nw.length)return nw;
  s.trSeen=seen.concat(nw.map(t=>t.id));sv(s);const show=()=>mini?toast(nw):openBox(nw,false);if(delay)setTimeout(show,delay);else show();return nw}
+const DANCER_SVG=`<svg viewBox="0 0 120 152" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+<g class="dn-turn"><g class="dn-all">
+<g class="dn-skirt"><path d="M45 86h30c8 20 24 36 31 54-7 7-12 4-16 2-5 6-11 4-15 1-4 5-10 5-15 0-5 4-11 5-15-1-4 3-9 5-16-2 7-18 23-34 31-54z" fill="#12a9bd"/><path d="M40 106c13 5 27 5 40 0l5 10c-16 7-34 7-50 0z" fill="#e0307a"/><path d="M30 126c20 8 40 8 60 0l5 9c-22 10-48 10-70 0z" fill="#ff5c9a"/><path d="M45 86h30l3 8c-12 5-24 5-36 0z" fill="#0e8fa3"/></g>
+<ellipse class="dn-ftL" cx="49" cy="146" rx="8" ry="4" fill="#7a1f3d"/><ellipse class="dn-ftR" cx="71" cy="146" rx="8" ry="4" fill="#7a1f3d"/>
+<g class="dn-body">
+<path d="M45 62q15-5 30 0l3 28H42z" fill="#1fc0d6"/><path d="M52 61l8 20 8-20" fill="none" stroke="#3b2a45" stroke-width="4.5" stroke-linejoin="round"/><circle cx="56" cy="70" r="1.6" fill="#ff8fb5"/><circle cx="62" cy="76" r="1.6" fill="#ffd1e1"/><circle cx="64" cy="68" r="1.5" fill="#ff8fb5"/>
+<g class="dn-armL"><path d="M39 63q7-5 14 0l2 20q-9 7-18 0z" fill="#fff" stroke="#c9d6e2" stroke-width="1"/><path d="M36 82q10 7 20 0l-1 5q-9 6-18 0z" fill="#ffd1e1"/><g class="dn-hand"><circle cx="46" cy="92" r="5" fill="#ffd9bd"/><path d="M42 95l-2 4M46 97v5M50 95l2 4" stroke="#ffd9bd" stroke-width="2.2" stroke-linecap="round"/></g></g>
+<g class="dn-armR"><path d="M67 63q7-5 14 0l4 20q-9 7-18 0z" fill="#fff" stroke="#c9d6e2" stroke-width="1"/><path d="M64 82q10 7 20 0l-1 5q-9 6-18 0z" fill="#ffd1e1"/><g class="dn-hand"><circle cx="74" cy="92" r="5" fill="#ffd9bd"/><path d="M70 95l-2 4M74 97v5M78 95l2 4" stroke="#ffd9bd" stroke-width="2.2" stroke-linecap="round"/></g></g>
+<g class="dn-head">
+<ellipse cx="85" cy="58" rx="6" ry="14" fill="#2d1b2e" transform="rotate(-18 85 58)"/><circle cx="60" cy="34" r="25" fill="#2d1b2e"/>
+<rect x="55" y="54" width="10" height="9" rx="3" fill="#ffd9bd"/><circle cx="60" cy="38" r="21" fill="#ffd9bd"/>
+<path d="M38 36c-1-17 10-24 22-24s23 8 22 24c-6-9-12-14-22-14s-16 5-22 14z" fill="#2d1b2e"/>
+<ellipse cx="52" cy="39" rx="2.3" ry="3.2" fill="#2d1b2e"/><ellipse cx="68" cy="39" rx="2.3" ry="3.2" fill="#2d1b2e"/><circle cx="52.8" cy="37.8" r=".9" fill="#fff"/><circle cx="68.8" cy="37.8" r=".9" fill="#fff"/>
+<path d="M48 33q4-3 8-1M64 32q4-2 8 1" stroke="#2d1b2e" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+<circle cx="46" cy="46" r="3.6" fill="#ff9db8" opacity=".6"/><circle cx="74" cy="46" r="3.6" fill="#ff9db8" opacity=".6"/>
+<path d="M54 47q6 6 12 0" stroke="#c4284f" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M39 48v5" stroke="#d4a017" stroke-width="1"/><ellipse cx="39" cy="56" rx="2" ry="3.2" fill="#e0243f"/><path d="M81 48v5" stroke="#d4a017" stroke-width="1"/><ellipse cx="81" cy="56" rx="2" ry="3.2" fill="#e0243f"/>
+<g transform="translate(36 20)"><circle cx="0" cy="0" r="10" fill="#d6246e"/><circle cx="-6" cy="-3" r="6.5" fill="#e0307a"/><circle cx="5" cy="-5" r="6" fill="#c41a63"/><circle cx="2" cy="5" r="6.5" fill="#e0307a"/><circle cx="-3" cy="3" r="4" fill="#ff5c9a"/><circle cx="1" cy="-1" r="3" fill="#b0124f"/></g>
+<path d="M66 13l1.6 3.6 3.9.4-2.9 2.6.8 3.8-3.4-2-3.4 2 .8-3.8-2.9-2.6 3.9-.4z" fill="#f4c430" stroke="#c8961a" stroke-width=".6"/>
+</g></g></g>
+<text class="dn-n1" x="96" y="26" font-size="15" fill="#d6246e">♪</text><text class="dn-n2" x="6" y="30" font-size="13" fill="#12a9bd">♪</text><text class="dn-n3" x="92" y="62" font-size="13" font-weight="800" fill="#e8873a">喀!</text>
+</svg>`;
+const NL_KEY="neNearLv1";
+function nlSeen(){try{const o=JSON.parse(localStorage.getItem(NL_KEY)||"{}");return Array.isArray(o.seen)?o.seen:[]}catch(e){return[]}}
+function peekNearLv(){if(!mini||!document.body)return;document.querySelectorAll(".rp-peek").forEach(n=>n.remove());
+ const d=document.createElement("div");d.className="rp-peek";d.setAttribute("aria-hidden","true");d.innerHTML=DANCER_SVG.replace('viewBox="0 0 120 152"','viewBox="0 0 120 100"')+'<span class="rp-peek-b">快升級了！</span>';
+ document.body.appendChild(d);setTimeout(()=>d.remove(),2100)}
+function nearCheck(L0,L1,v){if(L1>L0||v.max||!mini||!(v.cur/v.nx>=.8&&v.cur<v.nx))return;const seen=nlSeen();if(seen.indexOf(v.L)>=0)return;
+ seen.push(v.L);try{localStorage.setItem(NL_KEY,JSON.stringify({seen}))}catch(e){}peekNearLv()}
 function gain(o){const s=st();const L0=lvOf(s.xp).L;let b,lab=[];
  if(o.t==="quiz")b=o.ok?BASE.quizOk:BASE.quizBad;else b=BASE[o.t];if(!b)return;let x=o.isNew===false?b[1]:b[0];
  if(o.t==="quiz"){if(o.ok){s.combo++;s.best=Math.max(s.best,s.combo);const m=has(L0,"combo3")&&s.combo>=10?2:has(L0,"combo2")&&s.combo>=5?1.5:has(L0,"combo1")&&s.combo>=3?1.2:1;if(m>1){x*=m;lab.push("名媛社交 "+s.combo+" ×"+m)}}else s.combo=0}
@@ -277,7 +319,7 @@ function gain(o){const s=st();const L0=lvOf(s.xp).L;let b,lab=[];
  const xb=has(L0,"xp20")?20:has(L0,"xp10")?10:0;if(xb)x*=1+xb/100;
  if(has(L0,"daily")&&s.day.n<10&&o.t!=="crown"&&o.t!=="king"){x*=2;lab.push("早午餐×2")}if(o.t!=="crown"&&o.t!=="king")s.day.n++;
  x=Math.max(1,Math.round(x));s.xp+=x;if(a)s.at[a]=(s.at[a]||0)+x;sv(s);
- pop("+"+x+" XP"+(lab.length?" "+lab.join(" "):""));const L1=lvOf(s.xp).L;if(L1>L0)setTimeout(()=>levelUp(L1),400);trCheck(L1>L0&&!mini?3600:0);drawMini();if(RPG.onChange)RPG.onChange()}
+ pop("+"+x+" XP"+(lab.length?" "+lab.join(" "):""));const L1=lvOf(s.xp).L;if(L1>L0)setTimeout(()=>levelUp(L1),400);trCheck(L1>L0&&!mini?3600:0);drawMini();nearCheck(L0,L1,lvOf(s.xp));if(RPG.onChange)RPG.onChange()}
 let mini=null;function drawMini(){if(!mini)return;const s=st(),v=lvOf(s.xp),t=title(v.L);mini.innerHTML=`<a class="rp-go" href="index.html#rpg">${avatar(v.L,30)}<div style="flex:1;min-width:0"><b>Lv ${v.L}</b> <span style="font-size:11px;color:var(--mu)">${t[1]}</span><div class="rp-bar"><i style="width:${Math.round(v.cur/v.nx*100)}%"></i></div></div></a>`}
 function hints(){const s=st(),L=lvOf(s.xp).L;const max=has(L,"hint3")?3:has(L,"hint2")?2:has(L,"hint1")?1:0;return[max,Math.max(0,max-(s.day.h||0))]}
 function hintUI(){const cfg=RW.cfg;if(!cfg||!cfg.qans)return;const qo=document.getElementById("qo");if(!qo)return;let b=document.getElementById("rphint");
@@ -315,5 +357,5 @@ function home(el){migrate();homeEl=el;const draw=()=>{const s=st(),v=lvOf(s.xp),
  XP：聽新卡 10（重聽 3）・答對 15（同題再答 8）・答錯 3・口說 12（重複 5）・課文新句 8（重聽 3）・題型全部完成 +50・單元全部完成 +150。<br>
  屬性：課文跟讀→聽力、口說→口說、單字卡和測驗→詞彙（念例句也算單字練習 XP）。屬性每升 1 級，該類 XP +2%（上限 30%）。<br>
  能力：${ABIL.map(a=>"Lv"+a.lv+" "+a.name+"："+a.desc).join("；")}。<br>${s.migXP?"已把之前的💵和練習紀錄換算成 "+s.migXP+" XP。":""}<br>寶藏會依累計 XP 自動開箱，經驗值不會被花掉。</details></div>`;drawAssets()};draw();RPG.onChange=draw;trCheck()}
-window.RPG={page,home,st,lvOf,need,gain,hints,avatar,TITLES,ABIL,TREASURES,CATS,trValue,money,worth};
+window.RPG={peekNearLv,dancerSVG:DANCER_SVG,page,home,st,lvOf,need,gain,hints,avatar,TITLES,ABIL,TREASURES,CATS,trValue,money,worth};
 })();
