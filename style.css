@@ -74,3 +74,24 @@ a.nav{color:var(--ac)}
 
 /* 單字大卡的新聞照片記憶鉤（只有帶 photo 的卡才有；小卡網格不放照片） */
 .bc .cph:empty{display:none}.bc .cph{position:relative;width:100%;margin-top:6px}.bc .cph img{display:block;width:100%;height:120px;object-fit:cover;border-radius:10px}.bc .cph span{display:block;margin-top:3px;font-size:12px;line-height:1.3;color:var(--mu);text-align:left}
+/* ===== 小遊戲（games.js）：class 一律 gm- 開頭 ===== */
+.gm{display:flex;flex-direction:column;gap:8px}.gm-box{gap:12px}.gm-sub{font-size:13px}
+.gm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.gm-card{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;border-radius:14px;border:1px solid var(--ln);background:var(--cd);color:var(--fg);text-align:center;min-height:130px;font:inherit}
+.gm-card:active{border-color:var(--ac)}.gm-ic{font-size:34px;line-height:1.1}.gm-card b{font-size:17px}.gm-ds{font-size:12px;color:var(--mu)}.gm-best{font-size:12px;font-weight:700;color:var(--ac);margin-top:auto}
+.gm-top{display:flex;align-items:center;gap:10px}.gm-back{padding:8px 12px;border-radius:10px;border:1px solid var(--ln);background:var(--cd);color:var(--fg);font-size:15px;font-weight:600}
+.gm-stats{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;font-weight:700;color:var(--mu)}.gm-stats .gm-hot{color:#e8873a}
+.gm-flip{perspective:900px;height:220px}.gm-fc{position:relative;width:100%;height:100%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .5s ease}.gm-fc.on{transform:rotateY(180deg)}
+.gm-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px;border-radius:16px;border:2px solid var(--ln);background:var(--cd);backface-visibility:hidden;-webkit-backface-visibility:hidden;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none}
+.gm-bk{transform:rotateY(180deg);background:var(--tint);border-color:var(--ac)}
+.gm-w{font-size:30px;font-weight:800;overflow-wrap:anywhere;line-height:1.2}.gm-ip{font-size:15px;color:var(--mu)}.gm-hint{font-size:12px;margin-top:6px}.gm-zh{font-size:26px;font-weight:800;overflow-wrap:anywhere}.gm-pos{font-size:14px;color:var(--mu)}
+.gm-ans .b{min-height:52px}.gm-yes{background:var(--ok);color:#fff;border-color:var(--ok)}.gm-no{color:var(--bad)}
+.gm-q{display:flex;align-items:center;gap:12px}.gm-q .b{flex:1}.gm-play{width:84px;height:84px;border-radius:50%;border:0;background:var(--ac);color:#fff;font-size:36px;flex:none}
+.gm-opts{display:grid;grid-template-columns:1fr;gap:8px}.gm-opt{min-height:50px;overflow-wrap:anywhere}.gm-opt.ok{background:var(--ok);border-color:var(--ok);color:#fff}.gm-opt.bad{background:var(--bad);border-color:var(--bad);color:#fff}.gm-opt:disabled{opacity:1}
+.gm-extra .b,#gmbody>.b{flex:none}.gm-fb{min-height:22px;font-size:17px}.gm-g{color:var(--ok)}.gm-r{color:var(--bad)}.gm-extra{display:flex;flex-direction:column;gap:6px}.gm-zh2{font-size:20px;font-weight:800}
+.gm-sent{font-size:19px;line-height:1.6;font-weight:600}.gm-blank{display:inline-block;min-width:80px;border-bottom:3px solid var(--ac);color:var(--ac);text-align:center;letter-spacing:2px}.gm-fill{font-weight:800;border-radius:6px;padding:0 4px}.gm-fill.ok{background:var(--ok);color:#fff}.gm-fill.bad{background:var(--bad);color:#fff}
+.gm-end{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}.gm-end .row{width:100%}.gm-trophy{font-size:52px}.gm-rec{font-size:20px;font-weight:800;color:#e8873a;animation:gmpop .6s ease}.gm-big{font-size:54px;font-weight:800;line-height:1}.gm-big small{font-size:18px;color:var(--mu)}
+.gm-res{display:flex;gap:8px;width:100%}.gm-res>div{flex:1;display:flex;flex-direction:column;background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:10px 4px}.gm-res b{font-size:22px}.gm-res span{font-size:12px;color:var(--mu)}
+@keyframes gmpop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+.gm-conf{position:fixed;inset:0;pointer-events:none;z-index:95;overflow:hidden}.gm-conf span{position:absolute;top:-30px;font-size:26px;animation:gmfall 2.6s linear forwards}@keyframes gmfall{to{transform:translateY(110vh) rotate(540deg)}}
+#gmnx{width:100%;min-height:50px}
