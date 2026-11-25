@@ -96,7 +96,7 @@ $("texts").innerHTML=textsHTML();bindTexts();
 if(window.MW){MW.bindRich($("texts"),{sel:".sn",onTap:c=>{stop();const e=c,j=+e.dataset.j;e.classList.add("hl");play1(SENT[j]).then(()=>e.classList.remove("hl"))}});
  MW.bindRich($("ex"),{sel:".exn"})}
 if($("syn")){$("syn").innerHTML=synHTML();$("syn").querySelectorAll("tr").forEach(tr=>tr.onclick=()=>once([W.syn[+tr.dataset.k][0]]))}
-const GN={"咖啡篇單字":"咖啡篇","快報焦點":"焦點快報","洞察篇單字":"洞察篇","太空篇單字":"太空篇"};
+const GN={"咖啡篇單字":"咖啡篇","快報焦點":"焦點快報","洞察篇單字":"洞察篇","太空篇單字":"太空篇","遊行專文單字":"遊行篇"};
 const gLast=G.map(()=>-1);
 /* 分組按鈕：簡稱＋張數。選中組用目前 i，其他組用上次停留張數（沒去過則該組的起始張，同 startIdx 規則） */
 function grpLabels(){gLast[g]=i;G.forEach((x,k)=>{const b=$("grp").children[k];if(!b)return;const n=x.cards.length,cur=k===g?i:(gLast[k]>=0?gLast[k]:startIdx(k));
