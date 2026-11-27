@@ -17,8 +17,12 @@ function ensure(){
 /* 在使用者點擊當下呼叫，把共用音訊解鎖，之後回音法的間隔再播才不會被擋。 */
 function unlock(){
   try{
+    /* 只在手勢裡解鎖自動播放；不要把共用 <audio> 裡上一段單字／句子再播一次。 */
+    if(cur)return;
     const a=ensure();
-    if(!a.src)a.src=SILENT;
+    const src=a.src||"";
+    if(src&&!src.startsWith("data:"))return;
+    if(!src)a.src=SILENT;
     const p=a.play();
     if(p&&p.then)p.then(()=>{try{if(!cur){a.pause();a.currentTime=0}}catch(e){}}).catch(()=>{});
   }catch(e){}

@@ -49,7 +49,10 @@ let W=null,root=null,sec=null;const ST={},EL={};
 /* 語速跟單元頁目前的 rate（unit.js 的全域 let），沒有就 0.85 */
 function speed(){try{return typeof rate==="number"&&rate>0?rate:0.85}catch(e){return .85}}
 /* TTS.play 本身會取消前一段，所以三款音訊不會重疊；不拆任何 DOM */
-function say(text){if(!text||!hasAudio(text)||!window.TTS)return;try{TTS.unlock&&TTS.unlock();TTS.play(text,speed())}catch(e){}}
+let lastSay=0,lastTxt="";
+function say(text){if(!text||!hasAudio(text)||!window.TTS)return;
+ const now=Date.now();if(text===lastTxt&&now-lastSay<400)return;lastSay=now;lastTxt=text;
+ try{TTS.play(text,speed())}catch(e){}}
 function xpNow(){try{return RPG.st().xp||0}catch(e){return 0}}
 function gainXP(ok,isNew){try{RPG.gain({t:"quiz",ok:!!ok,isNew:!!isNew,uid:W.uid})}catch(e){}}
 function confetti(){const f=document.createElement("div");f.className="gm-conf";for(let k=0;k<22;k++){const s=document.createElement("span");s.textContent=["🎉","✨","💎","👑","🎊"][k%5];s.style.left=(Math.random()*96)+"vw";s.style.animationDelay=(Math.random()*.6)+"s";f.appendChild(s)}document.body.appendChild(f);setTimeout(()=>f.remove(),3400)}
@@ -88,15 +91,15 @@ function mountBuddy(card){
  const btn=b.firstChild,bub=b.lastChild,KS=["cheer","sway","dance","big","angry","spin"];
  dressAngry(btn);
  const anim=(k,ms)=>{btn.classList.remove(...KS);void btn.offsetWidth;btn.classList.add(k);clearTimeout(b._t);b._t=setTimeout(()=>btn.classList.remove(k),ms)};
- const say=(t,bad)=>{bub.textContent=t;bub.classList.toggle("bad",!!bad);bub.classList.add("on");clearTimeout(b._u);b._u=setTimeout(()=>bub.classList.remove("on","bad"),1100)};
+ const bubble=(t,bad)=>{bub.textContent=t;bub.classList.toggle("bad",!!bad);bub.classList.add("on");clearTimeout(b._u);b._u=setTimeout(()=>bub.classList.remove("on","bad"),1100)};
  btn.addEventListener("click",e=>{e.stopPropagation();anim("spin",650)});
  b.react=(kind,t)=>{
-  if(kind==="ok"){anim("cheer",600);say(t||BUB_OK[bubI++%BUB_OK.length])}
-  else if(kind==="sway"){anim("sway",800);say(t||BUB_OK[bubI++%BUB_OK.length])}
-  else if(kind==="dance"){anim("dance",1250);say(t||"🔥 連對！Olé!")}
-  else if(kind==="big"){anim("big",1500);say(t||"喀!")}
-  else if(kind==="angry"||kind==="no"){anim("angry",1000);say(t||BUB_NO[noI++%BUB_NO.length],true)}
-  else if(kind==="say")say(t)};
+  if(kind==="ok"){anim("cheer",600);bubble(t||BUB_OK[bubI++%BUB_OK.length])}
+  else if(kind==="sway"){anim("sway",800);bubble(t||BUB_OK[bubI++%BUB_OK.length])}
+  else if(kind==="dance"){anim("dance",1250);bubble(t||"🔥 連對！Olé!")}
+  else if(kind==="big"){anim("big",1500);bubble(t||"喀!")}
+  else if(kind==="angry"||kind==="no"){anim("angry",1000);bubble(t||BUB_NO[noI++%BUB_NO.length],true)}
+  else if(kind==="say")bubble(t)};
  card.appendChild(b);card._bd=b;return b}
 const buddy=(id,kind,t)=>{const c=EL[id];if(c&&c._bd)c._bd.react(kind,t)};
 function buildCard(g){const el=document.createElement("div");el.className="box gm-box gm-zone";el.dataset.g=g.id;
@@ -171,7 +174,9 @@ function runCloze(S){
   body.innerHTML=`<div class="gm-sent">${esc(it.pre)}<span class="gm-blank">＿＿＿＿＿</span>${esc(it.post)}</div>${optsHTML(it)}<div class="gm-extra"></div><button class="b p gm-nx" style="display:none"></button>`;
   return{reveal:ok=>{body.querySelector(".gm-sent").innerHTML=`${esc(it.pre)}<span class="gm-fill ${ok?"ok":"bad"}">${esc(it.mid)}</span>${esc(it.post)}`;
    body.querySelector(".gm-extra").innerHTML=`<div class="mu">${esc(it.zh)}</div><button class="b gm-ls" type="button">🔊 聽整句</button>`;
-   body.querySelector(".gm-ls").onclick=()=>say(it.sent);say(it.sent)}}})}
+   const ls=body.querySelector(".gm-ls");let ready=Date.now()+400;ls.style.pointerEvents="none";
+   ls.onclick=()=>{if(Date.now()<ready)return;say(it.sent)};
+   say(it.sent);setTimeout(()=>{ls.style.pointerEvents=""},400)}}})}
 
 function init(){
  W=window.WEEK;sec=document.getElementById("sec-o");if(!W||!sec||!W.groups)return;
